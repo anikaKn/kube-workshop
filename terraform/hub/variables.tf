@@ -41,7 +41,5 @@ variable "kms_key_admin_roles" {
 variable "git_token" {
   description = "My git token"
   type        = string
-
-
 }
-  paasword                       = var.git_token
+
