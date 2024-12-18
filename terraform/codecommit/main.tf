@@ -5,7 +5,7 @@ locals {
   context_prefix = "gitops-bridge"
   #  git_repo="git@github.com:anikaKn"
   git_repo                  = "https://github.com/anikaKn"
-  # git_token                 = "" # TODO SSM
+  git_token                 = var.git_token
   gitops_workload_repo_name = var.gitops_workload_repo_name
   gitops_workload_org       = local.git_repo
   gitops_workload_repo      = local.gitops_workload_repo_name

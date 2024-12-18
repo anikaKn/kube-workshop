@@ -59,3 +59,7 @@ variable "gitops_workload_repo_name" {
   # default     = "gitops-apps"
   default = "kube-workshop-workload.git"
 }
+variable "git_token" {
+  description = "My git token"
+  type        = string
+}
