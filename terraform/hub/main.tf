@@ -43,7 +43,7 @@ locals {
   vpc_cidr        = var.vpc_cidr
 
   username                       = "anikaKn"
-  paasword                       = "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"
+  paasword                       = var.git_token
   argocd_host                    = "itfuture.click" # TODO SET domain
   certificate_arn                = ""               #TODO cert
   external_dns_route53_zone_arns = ["arn:aws:route53:::hostedzone/Z0472995P920M8ZJM6Z2"]
