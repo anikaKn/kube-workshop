@@ -10,9 +10,10 @@ ROOTDIR=$SCRIPTDIR
 # export TF_VAR_ssh_key_basepath="/home/ec2-user/.ssh"
 
 # Deploy the infrastructure
+${ROOTDIR}/terraform/github-actions/deploy.sh
 # ${ROOTDIR}/terraform/codecommit/deploy.sh
 # source ${ROOTDIR}/setup-git.sh
-${ROOTDIR}/terraform/hub/deploy.sh
+# ${ROOTDIR}/terraform/hub/deploy.sh
 # ${ROOTDIR}/terraform/spokes/deploy.sh staging
 # ${ROOTDIR}/terraform/spokes/deploy.sh prod
-source ${ROOTDIR}/setup-kubectx.sh
+# source ${ROOTDIR}/setup-kubectx.sh
