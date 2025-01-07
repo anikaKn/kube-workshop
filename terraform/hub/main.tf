@@ -8,12 +8,14 @@ data "aws_iam_session_context" "current" {
   # Ref https://github.com/hashicorp/terraform-provider-aws/issues/28381
   arn = data.aws_caller_identity.current.arn
 }
-
+data "aws_eks_cluster_auth" "eks" {
+  name = local.name
+}
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-
+    token                  = data.aws_eks_cluster_auth.eks.token
     exec {
       api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws"
@@ -151,6 +153,15 @@ locals {
   }
 
   azs = slice(data.aws_availability_zones.available.names, 0, 3)
+
+kubernetes_admins = [
+    {
+      userarn    = "arn:aws:iam::022698001278:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
+      username   = "aknys"
+      policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    }
+    ]
+
 
   tags = {
     Blueprint  = local.name
@@ -385,6 +396,20 @@ module "eks" {
       })
     }
   }
+access_entries = { for admin in local.kubernetes_admins : admin.username => {
+    kubernetes_groups = [],
+    principal_arn     = admin.userarn,
+    policy_associations = {
+      admin_policy = {
+        policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
+        access_scope = {
+          type = "cluster"
+        }
+      }
+    }
+    }
+  }
+
   tags = local.tags
 }
 
