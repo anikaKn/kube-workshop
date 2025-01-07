@@ -66,7 +66,7 @@ provider "registry.terraform.io/hashicorp/helm" {
 
 provider "registry.terraform.io/hashicorp/kubernetes" {
   version     = "2.22.0"
-  constraints = ">= 2.10.0, >= 2.20.0, >= 2.22.0, 2.22.0"
+  constraints = ">= 2.20.0, >= 2.22.0, 2.22.0"
   hashes = [
     "h1:b6Wj111/wsMNg8FrHFXrf4mCZFtSXKHx4JvbZh3YTCY=",
     "zh:1eac662b1f238042b2068401e510f0624efaf51fd6a4dd9c49d710a49d383b61",
