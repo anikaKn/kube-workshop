@@ -353,7 +353,7 @@ module "eks" {
   # Manage aws-auth configmap to be able to add workshop roles into it
   # manage_aws_auth_configmap = true
   authentication_mode = "API_AND_CONFIG_MAP"
-    # manage_aws_auth = true # test
+  # manage_aws_auth = true # test
   # aws_auth_roles            = var.aws_auth_roles
 
   vpc_id     = module.vpc.vpc_id
