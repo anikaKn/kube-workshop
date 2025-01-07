@@ -337,7 +337,7 @@ module "eks_blueprints_addons" {
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.26"
+version = "~> 20.26"
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
