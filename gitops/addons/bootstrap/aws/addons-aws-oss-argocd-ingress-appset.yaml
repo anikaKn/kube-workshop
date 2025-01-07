@@ -1,5 +1,5 @@
 ---
-apiVersion: argoproj.io/v1alpha1 # TODO
+apiVersion: argoproj.io/v1alpha1 
 kind: ApplicationSet
 metadata:
   name: addons-aws-argocd-ingress

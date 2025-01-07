@@ -13,7 +13,7 @@ ROOTDIR=$SCRIPTDIR
 ${ROOTDIR}/terraform/github-actions/deploy.sh
 # ${ROOTDIR}/terraform/codecommit/deploy.sh
 # source ${ROOTDIR}/setup-git.sh
-# ${ROOTDIR}/terraform/hub/deploy.sh
+${ROOTDIR}/terraform/hub/deploy.sh
 # ${ROOTDIR}/terraform/spokes/deploy.sh staging
 # ${ROOTDIR}/terraform/spokes/deploy.sh prod
-# source ${ROOTDIR}/setup-kubectx.sh
+source ${ROOTDIR}/setup-kubectx.sh

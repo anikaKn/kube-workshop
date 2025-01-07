@@ -346,6 +346,7 @@ module "eks" {
 
   # Manage aws-auth configmap to be able to add workshop roles and argo role into it
   manage_aws_auth_configmap = true
+
   aws_auth_roles = distinct(concat(
     var.aws_auth_roles,
     [

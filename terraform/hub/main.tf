@@ -337,7 +337,7 @@ module "eks_blueprints_addons" {
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.13"
+  version = "~> 20.26"
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
@@ -351,8 +351,10 @@ module "eks" {
 
   ))
   # Manage aws-auth configmap to be able to add workshop roles into it
-  manage_aws_auth_configmap = true
-  aws_auth_roles            = var.aws_auth_roles
+  # manage_aws_auth_configmap = true
+  authentication_mode = "API_AND_CONFIG_MAP"
+    # manage_aws_auth = true # test
+  # aws_auth_roles            = var.aws_auth_roles
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
