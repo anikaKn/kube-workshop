@@ -11,6 +11,7 @@ data "aws_iam_session_context" "current" {
 data "aws_eks_cluster_auth" "eks" {
   name = local.name
 }
+
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
