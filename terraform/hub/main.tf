@@ -361,9 +361,12 @@ module "eks" {
     [data.aws_iam_session_context.current.issuer_arn]
 
   ))
+  # Optional: Adds the current caller identity as an administrator via cluster access entry
+  enable_cluster_creator_admin_permissions = true
+
   # Manage aws-auth configmap to be able to add workshop roles into it
   # manage_aws_auth_configmap = true
-  authentication_mode = "API_AND_CONFIG_MAP"
+  # authentication_mode = "API_AND_CONFIG_MAP"
   # manage_aws_auth = true # test
   # aws_auth_roles            = var.aws_auth_roles
 
@@ -396,19 +399,19 @@ module "eks" {
       })
     }
   }
-access_entries = { for admin in local.kubernetes_admins : admin.username => {
-    kubernetes_groups = [],
-    principal_arn     = admin.userarn,
-    policy_associations = {
-      admin_policy = {
-        policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
-        access_scope = {
-          type = "cluster"
-        }
-      }
-    }
-    }
-  }
+# access_entries = { for admin in local.kubernetes_admins : admin.username => {
+#     kubernetes_groups = [],
+#     principal_arn     = admin.userarn,
+#     policy_associations = {
+#       admin_policy = {
+#         policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
+#         access_scope = {
+#           type = "cluster"
+#         }
+#       }
+#     }
+#     }
+  # }
 
   tags = local.tags
 }
