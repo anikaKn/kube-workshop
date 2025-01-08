@@ -11,7 +11,7 @@ ROOTDIR=$SCRIPTDIR
 
 # Deploy the infrastructure
 ${ROOTDIR}/terraform/github-actions/deploy.sh
-${ROOTDIR}/terraform/codecommit/deploy.sh
+# ${ROOTDIR}/terraform/codecommit/deploy.sh
 # source ${ROOTDIR}/setup-git.sh
 ${ROOTDIR}/terraform/hub/deploy.sh
 # ${ROOTDIR}/terraform/spokes/deploy.sh staging
