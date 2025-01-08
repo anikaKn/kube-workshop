@@ -10,6 +10,10 @@ locals {
   gitops_workload_org       = local.git_repo
   gitops_workload_repo      = local.gitops_workload_repo_name
 
+
+  gitops_manifest_repo_name = var.gitops_manifest_repo_name
+  gitops_manifest_org       = local.git_repo
+  gitops_manifest_repo      = local.gitops_manifest_repo_name
   # gitops_platform_repo_name = var.gitops_platform_repo_name
   # gitops_platform_org       = "ssh://${aws_iam_user_ssh_key.gitops.id}@git-codecommit.${data.aws_region.current.id}.amazonaws.com"
   # gitops_platform_repo      = "v1/repos/${local.gitops_platform_repo_name}"
@@ -35,46 +39,6 @@ locals {
 
 }
 
-# resource "aws_codecommit_repository" "workloads" {
-#   repository_name = local.gitops_workload_repo_name
-#   description     = "CodeCommit repository for ArgoCD workloads"
-# }
-
-# resource "aws_codecommit_repository" "platform" {
-#   repository_name = local.gitops_platform_repo_name
-#   description     = "CodeCommit repository for ArgoCD platform"
-# }
-
-# resource "aws_codecommit_repository" "addons" {
-#   repository_name = local.gitops_addons_repo_name
-#   description     = "CodeCommit repository for ArgoCD addons"
-# }
-
-# resource "aws_codecatalyst_space" "kube_space" {
-#   name        = "my-kube-space" # Replace with your desired space name
-#   description = "This is an kube space for organizing projects."
-# }
-# resource "aws_codecatalyst_project" "workloads" {
-#   # name        = local.gitops_workload_repo_name
-#   display_name= local.gitops_workload_repo_name
-#   description = "Project for ArgoCD workloads"
-#   space_name  = "my-kube-space"
-# }
-
-# resource "aws_codecatalyst_project" "platform" {
-#   # name        = local.gitops_platform_repo_name
-#   display_name= local.gitops_platform_repo_name
-#   description = "Project for ArgoCD platform"
-#   space_name  = "my-kube-space"
-# }
-
-# resource "aws_codecatalyst_project" "addons" {
-#   # name        = local.gitops_addons_repo_name
-#   display_name= local.gitops_addons_repo_name
-#   description = "Project for ArgoCD addons"
-
-#   space_name = "my-kube-space"
-# }
 resource "aws_iam_user" "gitops" {
   name = "${local.context_prefix}-gitops"
   path = "/"
@@ -98,14 +62,14 @@ resource "random_string" "secret_suffix" {
   lower   = true  # Set to true if you want lowercase letters in the string
   number  = true  # Set to true if you want numbers in the string
 }
-resource "aws_secretsmanager_secret" "codecommit_key" {
-  name = "codecommit-key-${random_string.secret_suffix.result}"
-}
+# resource "aws_secretsmanager_secret" "codecommit_key" {
+#   name = "aknys-codecommit-key-${random_string.secret_suffix.result}"
+# }
 
-resource "aws_secretsmanager_secret_version" "private_key_secret_version" {
-  secret_id     = aws_secretsmanager_secret.codecommit_key.id
-  secret_string = tls_private_key.gitops.private_key_pem
-}
+# resource "aws_secretsmanager_secret_version" "private_key_secret_version" {
+#   secret_id     = aws_secretsmanager_secret.codecommit_key.id
+#   secret_string = tls_private_key.gitops.private_key_pem
+# }
 
 resource "local_file" "ssh_private_key" {
   content         = tls_private_key.gitops.private_key_pem
@@ -157,33 +121,7 @@ resource "null_resource" "append_string_block" {
     EOL
 
   }
+  
 }
 
 
-# data "aws_iam_policy_document" "gitops_access" {
-#   statement {
-#     sid = ""
-#     actions = [
-#       "codecatalyst:*",  # Adjust as necessary
-#     ]
-#     effect = "Allow"
-#     resources = [
-#       "arn:aws:codecatalyst:${data.aws_region.current.id}::space/my-kube-space/project/${local.gitops_workload_repo_name}",
-#       "arn:aws:codecatalyst:${data.aws_region.current.id}::space/my-kube-space/project/${local.gitops_platform_repo_name}",
-#       "arn:aws:codecatalyst:${data.aws_region.current.id}::space/my-kube-space/project/${local.gitops_addons_repo_name}"
-#       # aws_codecatalyst_project.workloads.arn,
-#       # aws_codecatalyst_project.platform.arn,
-#       # aws_codecatalyst_project.addons.arn
-#     ]
-#   }
-# }
-# resource "aws_iam_policy" "gitops_access" {
-#   name   = "${local.context_prefix}-gitops"
-#   path   = "/"
-#   policy = data.aws_iam_policy_document.gitops_access.json
-# }
-
-# resource "aws_iam_user_policy_attachment" "gitops_access" {
-#   user       = aws_iam_user.gitops.name
-#   policy_arn = aws_iam_policy.gitops_access.arn
-# }

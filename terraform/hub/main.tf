@@ -68,6 +68,11 @@ locals {
   gitops_workload_path     = data.terraform_remote_state.git.outputs.gitops_workload_path
   gitops_workload_revision = data.terraform_remote_state.git.outputs.gitops_workload_revision
 
+  gitops_manifest_url      = data.terraform_remote_state.git.outputs.gitops_manifest_url
+  gitops_manifest_basepath = data.terraform_remote_state.git.outputs.gitops_manifest_basepath
+  gitops_manifest_path     = data.terraform_remote_state.git.outputs.gitops_manifest_path
+  gitops_manifest_revision = data.terraform_remote_state.git.outputs.gitops_manifest_revision
+
   argocd_chart_version = "7.3.11" #"7.3.11"
   git_private_ssh_key  = data.terraform_remote_state.git.outputs.git_private_ssh_key
 
@@ -146,6 +151,12 @@ locals {
       workload_repo_basepath = local.gitops_workload_basepath
       workload_repo_path     = local.gitops_workload_path
       workload_repo_revision = local.gitops_workload_revision
+    },
+    {
+      manifest_repo_url      = local.gitops_manifest_url
+      manifest_repo_basepath = local.gitops_manifest_basepath
+      manifest_repo_path     = local.gitops_manifest_path
+      manifest_repo_revision = local.gitops_manifest_revision
     }
   )
 
@@ -204,6 +215,14 @@ resource "kubernetes_secret" "git_secrets" {
     git-workloads = {
       type = "git"
       url  = local.gitops_workload_url
+      # sshPrivateKey         = file(pathexpand(local.git_private_ssh_key))
+      # insecureIgnoreHostKey = "true"
+      username = local.username
+      paasword = local.paasword
+    }
+    git-manifest = {
+      type = "git"
+      url  = local.gitops_manifest_url
       # sshPrivateKey         = file(pathexpand(local.git_private_ssh_key))
       # insecureIgnoreHostKey = "true"
       username = local.username

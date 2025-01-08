@@ -87,11 +87,29 @@ output "gitops_workload_revision" {
   description = "Git repository revision/branch/ref for workload"
   value       = var.gitops_workload_revision
 }
-# output "codecommit_key_id" {
-#   description = "Secret name that holds the SSH key for accessing CodeCommit"
-#   value       = aws_secretsmanager_secret.codecommit_key.id
-# }
-# output "codecommit_key_name" {
-#   description = "Secret name that holds the SSH key for accessing CodeCommit"
-#   value       = aws_secretsmanager_secret.codecommit_key.name
-# }
+
+
+output "gitops_manifest_url" {
+  value = "${local.gitops_manifest_org}/${local.gitops_manifest_repo}"
+}
+output "gitops_manifest_org" {
+  description = "Git repository org/user contains for manifest"
+  value       = local.gitops_manifest_org
+}
+output "gitops_manifest_repo" {
+  description = "Git repository contains for manifest"
+  value       = local.gitops_manifest_repo
+}
+output "gitops_manifest_basepath" {
+  description = "Git repository base path for manifest"
+  value       = var.gitops_manifest_basepath
+}
+output "gitops_manifest_path" {
+  description = "Git repository path for manifest"
+  value       = var.gitops_manifest_path
+}
+output "gitops_manifest_revision" {
+  description = "Git repository revision/branch/ref for manifest"
+  value       = var.gitops_manifest_revision
+}
+

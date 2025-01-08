@@ -57,7 +57,26 @@ variable "gitops_workload_revision" {
 variable "gitops_workload_repo_name" {
   description = "Git repository name for workload"
   # default     = "gitops-apps"
-  default = "kube-workshop-workload.git"
+  default = "kube-workshop-addons.git"
+}
+
+
+variable "gitops_manifest_basepath" {
+  description = "Git repository base path for workload"
+  default     = ""
+}
+variable "gitops_manifest_path" {
+  description = "Git repository path for workload"
+  default     = ""
+}
+variable "gitops_manifest_revision" {
+  description = "Git repository revision/branch/ref for workload"
+  default     = "HEAD"
+}
+variable "gitops_manifest_repo_name" {
+  description = "Git repository name for workload"
+  # default     = "gitops-apps"
+  default = "kube-k8s-manifest-repo.git"
 }
 variable "git_token" {
   description = "My git token"
