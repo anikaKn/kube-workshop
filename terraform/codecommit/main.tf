@@ -121,7 +121,7 @@ resource "null_resource" "append_string_block" {
     EOL
 
   }
-  
+
 }
 
 

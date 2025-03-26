@@ -29,7 +29,7 @@ provider "helm" {
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    token                  = data.aws_eks_cluster_auth.eks.token
+  token                  = data.aws_eks_cluster_auth.eks.token
 
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
@@ -91,7 +91,7 @@ locals {
     enable_fargate_fluentbit                     = false
     enable_aws_for_fluentbit                     = false
     enable_aws_node_termination_handler          = false
-    enable_karpenter                             = false
+    enable_karpenter                             = true
     enable_velero                                = false
     enable_aws_gateway_api_controller            = false
     enable_aws_ebs_csi_resources                 = true # generate gp2 and gp3 storage classes for ebs-csi
@@ -157,6 +157,17 @@ locals {
       manifest_repo_basepath = local.gitops_manifest_basepath
       manifest_repo_path     = local.gitops_manifest_path
       manifest_repo_revision = local.gitops_manifest_revision
+    }, 
+    {
+      karpenter_node_instance_profile_name = module.eks_blueprints_addons.karpenter.node_instance_profile_name
+      karpenter_node_iam_role_name         = module.eks_blueprints_addons.karpenter.node_iam_role_name
+      karpenter_node_iam_role_arn          = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+      karpenter_sqs_queue_name             = module.eks_blueprints_addons.karpenter.sqs.queue_name
+      karpenter_iam_role_arn               = module.eks_blueprints_addons.karpenter.iam_role_arn
+      karpenter_cluster_endpoint           = module.eks.cluster_endpoint
+      karpenter_namespace                  = "karpenter"
+      karpenter_service_account            = "karpenter"
+      karpenter_capacity_type              = "[\"spot\"]"
     }
   )
 
@@ -167,13 +178,13 @@ locals {
 
   azs = slice(data.aws_availability_zones.available.names, 0, 3)
 
-kubernetes_admins = [
+  kubernetes_admins = [
     {
       userarn    = "arn:aws:iam::022698001278:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
       username   = "aknys"
       policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
     }
-    ]
+  ]
 
 
   tags = {
@@ -362,18 +373,20 @@ module "eks_blueprints_addons" {
 
   tags = local.tags
 }
-
 ################################################################################
 # EKS Cluster
 ################################################################################
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.26"
+  version = "~> 20.33"
 
-  cluster_name                   = local.name
+  cluster_name                   = local.resource_prefix
   cluster_version                = local.cluster_version
   cluster_endpoint_public_access = true
+
+  vpc_id     = module.vpc.vpc_id
+  subnet_ids = module.vpc.private_subnets
 
   # Combine root account, current user/role and additinoal roles to be able to access the cluster KMS key - required for terraform updates
   kms_key_administrators = distinct(concat([
@@ -382,27 +395,85 @@ module "eks" {
     [data.aws_iam_session_context.current.issuer_arn]
 
   ))
-  # Optional: Adds the current caller identity as an administrator via cluster access entry
+
+  # The following is a code to add customed security group rules
+  cluster_security_group_additional_rules = {
+    hybrid-all = {
+      cidr_blocks = [local.vpc_cidr]
+      description = "Allow all traffic to Istio control plane"
+      from_port   = 15017
+      to_port     = 15017
+      protocol    = "TCP"
+      type        = "ingress"
+    }
+  }
+
+  # To add the current caller identity as an administrator
   enable_cluster_creator_admin_permissions = true
 
-  # Manage aws-auth configmap to be able to add workshop roles into it
-  # manage_aws_auth_configmap = true
-  # authentication_mode = "API_AND_CONFIG_MAP"
-  # manage_aws_auth = true # test
-  # aws_auth_roles            = var.aws_auth_roles
-
-  vpc_id     = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
+  access_entries = { for admin in local.kubernetes_admins : admin.username => {
+    kubernetes_groups = [],
+    principal_arn     = admin.userarn,
+    policy_associations = {
+      admin_policy = {
+        policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
+        access_scope = {
+          type = "cluster"
+        }
+      }
+    }
+    }
+  }
 
   eks_managed_node_groups = {
-    initial = {
-      instance_types = ["t3.medium"]
+    # critical-addons = {
+    #   instance_types = ["t3.xlarge", "m5.xlarge"] #["t3.large"]
+
+    #   min_size     = 1
+    #   max_size     = 2
+    #   desired_size = 1
+
+    #   labels = {
+    #     # Used to ensure Karpenter runs on nodes that it does not manage
+    #     "karpenter.sh/controller" = "true"
+    #   }
+
+    #   taints = {
+    #     # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
+    #     # The pods that do not tolerate this taint should run on nodes created by Karpenter
+    #     addons = {
+    #       key    = "CriticalAddonsOnly"
+    #       value  = "true"
+    #       effect = "NO_SCHEDULE"
+    #     }
+    #   }
+    # }
+
+    critical-addons-arm = {
+      instance_types = ["t4g.large"]
+      ami_type       = "AL2023_ARM_64_STANDARD"
 
       min_size     = 1
       max_size     = 2
       desired_size = 1
+
+      labels = {
+        # Used to ensure Karpenter runs on nodes that it does not manage
+        "karpenter.sh/controller" = "true"
+      }
+
+      taints = {
+        # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
+        # The pods that do not tolerate this taint should run on nodes created by Karpenter
+        addons = {
+          key    = "CriticalAddonsOnly"
+          value  = "true"
+          effect = "NO_SCHEDULE"
+        }
+      }
     }
   }
+
   # EKS Addons
   cluster_addons = {
     vpc-cni = {
@@ -414,45 +485,66 @@ module "eks" {
       configuration_values = jsonencode({
         env = {
           # Reference docs https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
-          ENABLE_PREFIX_DELEGATION = "true"
-          WARM_PREFIX_TARGET       = "1"
+          ENABLE_POD_ENI                    = "true"
+          POD_SECURITY_GROUP_ENFORCING_MODE = "standard"
+          ENABLE_PREFIX_DELEGATION          = "true"
+          WARM_PREFIX_TARGET                = "1"
         }
       })
     }
+    #eks-pod-identity-agent = {}
   }
-# access_entries = { for admin in local.kubernetes_admins : admin.username => {
-#     kubernetes_groups = [],
-#     principal_arn     = admin.userarn,
-#     policy_associations = {
-#       admin_policy = {
-#         policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
-#         access_scope = {
-#           type = "cluster"
-#         }
-#       }
-#     }
-#     }
+  # access_entries = { for admin in local.kubernetes_admins : admin.username => {
+  #     kubernetes_groups = [],
+  #     principal_arn     = admin.userarn,
+  #     policy_associations = {
+  #       admin_policy = {
+  #         policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
+  #         access_scope = {
+  #           type = "cluster"
+  #         }
+  #       }
+  #     }
+  #     }
   # }
 
-  tags = local.tags
+  enable_efa_support = true
+
+  tags = {
+    # NOTE - if creating multiple security groups with this module, only tag the
+    # security group that Karpenter should utilize with the following tag
+    # (i.e. - at most, only one security group should have this tag in your account)
+    "karpenter.sh/discovery" = local.resource_prefix
+  }
 }
 
 ################################################################################
-# Supporting Resources
+# VPC
 ################################################################################
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 5.0"
+  version = "~> 5.18"
 
-  name = local.name
+  name = "${local.resource_prefix}-vpc"
   cidr = local.vpc_cidr
 
   azs             = local.azs
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
 
-  enable_nat_gateway = true
-  single_nat_gateway = true
+  enable_ipv6 = false
+
+  enable_dns_hostnames = true
+  enable_dns_support   = true
+
+  enable_nat_gateway     = true
+  single_nat_gateway     = true
+  one_nat_gateway_per_az = false
+  enable_vpn_gateway     = false
+
+  manage_default_network_acl    = false
+  manage_default_route_table    = false
+  manage_default_security_group = false
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1
@@ -460,6 +552,8 @@ module "vpc" {
 
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1
+    # Tags subnets for Karpenter auto-discovery
+    "karpenter.sh/discovery" = local.resource_prefix
   }
 
   tags = local.tags

@@ -216,26 +216,56 @@ data "aws_iam_policy_document" "assume_role_policy" {
 ################################################################################
 module "eks_blueprints_addons" {
   source  = "aws-ia/eks-blueprints-addons/aws"
-  version = "~> 1.0"
+  version = "~> 1.19"
 
   cluster_name      = module.eks.cluster_name
   cluster_endpoint  = module.eks.cluster_endpoint
   cluster_version   = module.eks.cluster_version
   oidc_provider_arn = module.eks.oidc_provider_arn
 
+  # eks_addons = {
+  #   aws-ebs-csi-driver = {
+  #     most_recent              = true
+  #     service_account_role_arn = module.ebs_csi_driver_irsa.iam_role_arn
+  #   }
+  #   coredns = {
+  #     most_recent = true
+
+  #     timeouts = {
+  #       create = "25m"
+  #       delete = "10m"
+  #     }
+  #     configuration_values = jsonencode({
+  #       tolerations = [
+  #         {
+  #           key      = "CriticalAddonsOnly"
+  #           operator = "Exists"
+  #         },
+  #         {
+  #           key      = "node.cilium.io/agent-not-ready"
+  #           operator = "Exists"
+  #         }
+  #       ]
+  #     })
+  #   }
+  #   kube-proxy = {
+  #     most_recent = true
+  #   }
+  #   aws-guardduty-agent = {}
+  # }
   # Using GitOps Bridge
   create_kubernetes_resources = false
 
   # EKS Blueprints Addons
-  enable_cert_manager                 = try(local.aws_addons.enable_cert_manager, false)
   enable_aws_efs_csi_driver           = try(local.aws_addons.enable_aws_efs_csi_driver, false)
   enable_aws_fsx_csi_driver           = try(local.aws_addons.enable_aws_fsx_csi_driver, false)
+  enable_cert_manager                 = try(local.aws_addons.enable_cert_manager, false)
+  enable_aws_load_balancer_controller = try(local.aws_addons.enable_aws_load_balancer_controller, false)
   enable_aws_cloudwatch_metrics       = try(local.aws_addons.enable_aws_cloudwatch_metrics, false)
   enable_aws_privateca_issuer         = try(local.aws_addons.enable_aws_privateca_issuer, false)
   enable_cluster_autoscaler           = try(local.aws_addons.enable_cluster_autoscaler, false)
   enable_external_dns                 = try(local.aws_addons.enable_external_dns, false)
   enable_external_secrets             = try(local.aws_addons.enable_external_secrets, false)
-  enable_aws_load_balancer_controller = try(local.aws_addons.enable_aws_load_balancer_controller, false)
   enable_fargate_fluentbit            = try(local.aws_addons.enable_fargate_fluentbit, false)
   enable_aws_for_fluentbit            = try(local.aws_addons.enable_aws_for_fluentbit, false)
   enable_aws_node_termination_handler = try(local.aws_addons.enable_aws_node_termination_handler, false)
@@ -244,8 +274,40 @@ module "eks_blueprints_addons" {
   enable_aws_gateway_api_controller   = try(local.aws_addons.enable_aws_gateway_api_controller, false)
 
   tags = local.tags
-}
 
+    # Wait for all Cert-manager related resources to be ready
+  cert_manager = {  # comment ?
+    wait = true
+  }
+  cert_manager_route53_hosted_zone_arns = local.route53_hosted_zone_arns  # comment ?
+
+  # Turn off mutation webhook for services to avoid ordering issue
+  aws_load_balancer_controller = { # comment ?
+    set = [{
+      name  = "enableServiceMutatorWebhook"
+      value = "false"
+    }]
+  }
+
+  # ## An S3 Bucket ARN is required. This can be declared with or without a Suffix.
+  # velero = {
+  #   s3_backup_location = "${try(data.terraform_remote_state.cluster_hub.outputs.velero_backup_s3_bucket_arn, "")}/${local.velero_backup_s3_bucket_prefix}"
+  # }
+
+  external_dns_route53_zone_arns = local.route53_hosted_zone_arns
+
+  karpenter_enable_instance_profile_creation = true
+
+  karpenter = {
+    repository_username = data.aws_ecrpublic_authorization_token.token.user_name
+    repository_password = data.aws_ecrpublic_authorization_token.token.password
+  }
+
+  karpenter_node = {
+    # Use static name so that it matches what is defined in `karpenter.yaml` example manifest
+    iam_role_use_name_prefix = true
+  }
+}
 ################################################################################
 # EKS ACK Addons
 ################################################################################
