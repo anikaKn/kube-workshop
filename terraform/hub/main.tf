@@ -217,10 +217,10 @@ locals {
 # GitOps Bridge: Private ssh keys for git
 ################################################################################
 resource "kubernetes_namespace" "argocd" {
-  depends_on = [module.eks_blueprints_addons, module.eks ]
   metadata {
     name = local.argocd_namespace
   }
+  depends_on = [module.eks_blueprints_addons, module.eks ]
 }
 resource "kubernetes_secret" "git_secrets" {
   depends_on = [kubernetes_namespace.argocd]
