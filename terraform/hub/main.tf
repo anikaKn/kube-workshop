@@ -39,6 +39,24 @@ provider "kubernetes" {
   }
 }
 
+# provider "kubernetes" {
+#   host                   = module.eks.cluster_endpoint
+#   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  
+#   exec {
+#     api_version = "client.authentication.k8s.io/v1beta1"
+#     command     = "aws"
+#     args = [
+#       "eks",
+#       "get-token",
+#       "--cluster-name",
+#       module.eks.cluster_name,
+#       "--region",
+#       var.region
+#     ]
+#   }
+# }
+
 locals {
   name            = "hub-cluster"
   environment     = "control-plane"
@@ -177,7 +195,7 @@ locals {
   }
 
   azs = slice(data.aws_availability_zones.available.names, 0, 3)
-
+  resource_prefix="aknys"
   kubernetes_admins = [
     {
       userarn    = "arn:aws:iam::022698001278:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
@@ -199,7 +217,7 @@ locals {
 # GitOps Bridge: Private ssh keys for git
 ################################################################################
 resource "kubernetes_namespace" "argocd" {
-  depends_on = [module.eks_blueprints_addons]
+  depends_on = [module.eks_blueprints_addons, module.eks ]
   metadata {
     name = local.argocd_namespace
   }
@@ -410,20 +428,20 @@ module "eks" {
 
   # To add the current caller identity as an administrator
   enable_cluster_creator_admin_permissions = true
-
-  access_entries = { for admin in local.kubernetes_admins : admin.username => {
-    kubernetes_groups = [],
-    principal_arn     = admin.userarn,
-    policy_associations = {
-      admin_policy = {
-        policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
-        access_scope = {
-          type = "cluster"
-        }
-      }
-    }
-    }
-  }
+# ##### TEMPORARY uncomment The specified access entry resource is already in use on this cluster.
+  # access_entries = { for admin in local.kubernetes_admins : admin.username => {
+  #   kubernetes_groups = [],
+  #   principal_arn     = admin.userarn,
+  #   policy_associations = {
+  #     admin_policy = {
+  #       policy_arn = admin.policy_arn #"arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy",
+  #       access_scope = {
+  #         type = "cluster"
+  #       }
+  #     }
+  #   }
+  #   }
+  # }
 
   eks_managed_node_groups = {
     # critical-addons = {
@@ -450,7 +468,7 @@ module "eks" {
     # }
 
     critical-addons-arm = {
-      instance_types = ["t4g.large"]
+      instance_types = ["t4g.xlarge"]
       ami_type       = "AL2023_ARM_64_STANDARD"
 
       min_size     = 1
