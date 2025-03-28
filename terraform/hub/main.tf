@@ -550,7 +550,7 @@ module "vpc" {
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
 
-  enable_ipv6 = false
+  # enable_ipv6 = false
 
   enable_dns_hostnames = true
   enable_dns_support   = true
