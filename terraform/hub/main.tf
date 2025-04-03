@@ -231,6 +231,13 @@ resource "aws_eks_access_entry" "karpenter_node_access_entry" {
   type = "EC2_LINUX"
   #  type          = "STANDARD"
 }
+
+# resource "aws_eks_access_entry" "eks_service_role_access_entry" {
+#   cluster_name   = module.eks.cluster_name
+#   principal_arn  = "arn:aws:iam::022698001278:role/aws-service-role/eks.amazonaws.com/AWSServiceRoleForAmazonEKS"
+#   type           = "STANDARD"
+# }
+
 # resource "aws_eks_access_entry" "power_user_access_entry" {
 #   cluster_name  = module.eks.cluster_name
 #   principal_arn = "arn:aws:iam::022698001278:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
