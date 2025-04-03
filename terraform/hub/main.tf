@@ -220,8 +220,25 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = local.argocd_namespace
   }
-  depends_on = [module.eks_blueprints_addons, module.eks ]
+  depends_on = [module.eks_blueprints_addons, module.eks , aws_eks_access_entry.karpenter_node_access_entry] 
 }
+
+resource "aws_eks_access_entry" "karpenter_node_access_entry" {
+  cluster_name  = module.eks.cluster_name
+  principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+  kubernetes_groups = []
+  type = "EC2_LINUX"
+}
+# resource "aws_eks_access_entry" "power_user_access_entry" {
+#   cluster_name  = module.eks.cluster_name
+#   principal_arn = "arn:aws:iam::022698001278:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
+#   type          = "STANDARD"
+# }
+
+# resource "aws_iam_role_policy_attachment" "power_user_admin_policy" {
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterAdminPolicy"
+#   role       = "AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
+# }
 resource "kubernetes_secret" "git_secrets" {
   depends_on = [kubernetes_namespace.argocd]
   for_each = {
@@ -405,6 +422,11 @@ module "eks" {
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
+  # Fargate profiles use the cluster primary security group so these are not utilized
+  # create_cluster_security_group = false #added from site
+  #  create_node_security_group    = false #added from site
+
+
 
   # Combine root account, current user/role and additinoal roles to be able to access the cluster KMS key - required for terraform updates
   kms_key_administrators = distinct(concat([
@@ -423,6 +445,24 @@ module "eks" {
       to_port     = 15017
       protocol    = "TCP"
       type        = "ingress"
+    }
+  }
+    node_security_group_additional_rules = {
+    nodes_istiod_port = {
+      description                   = "Cluster API to Node group for istiod webhook"
+      protocol                      = "tcp"
+      from_port                     = 15017
+      to_port                       = 15017
+      type                          = "ingress"
+      source_cluster_security_group = true
+    }
+    node_to_node_communication = {
+      description = "Allow full access for cross-node communication"
+      protocol    = "tcp"
+      from_port   = 0
+      to_port     = 65535
+      type        = "ingress"
+      self        = true
     }
   }
 
