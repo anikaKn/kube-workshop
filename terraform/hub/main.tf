@@ -227,7 +227,9 @@ resource "aws_eks_access_entry" "karpenter_node_access_entry" {
   cluster_name  = module.eks.cluster_name
   principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
   kubernetes_groups = []
+  # user_name           = "karpenter-node-access"
   type = "EC2_LINUX"
+  #  type          = "STANDARD"
 }
 # resource "aws_eks_access_entry" "power_user_access_entry" {
 #   cluster_name  = module.eks.cluster_name
@@ -245,32 +247,24 @@ resource "kubernetes_secret" "git_secrets" {
     git-addons = {
       type = "git"
       url  = local.gitops_addons_url
-      # sshPrivateKey         = file(pathexpand(local.git_private_ssh_key))
-      # insecureIgnoreHostKey = "true"
       username = local.username
       paasword = local.paasword
     }
     git-platform = {
       type = "git"
       url  = local.gitops_platform_url
-      # sshPrivateKey         = file(pathexpand(local.git_private_ssh_key))
-      # insecureIgnoreHostKey = "true"
       username = local.username
       paasword = local.paasword
     }
     git-workloads = {
       type = "git"
       url  = local.gitops_workload_url
-      # sshPrivateKey         = file(pathexpand(local.git_private_ssh_key))
-      # insecureIgnoreHostKey = "true"
       username = local.username
       paasword = local.paasword
     }
     git-manifest = {
       type = "git"
       url  = local.gitops_manifest_url
-      # sshPrivateKey         = file(pathexpand(local.git_private_ssh_key))
-      # insecureIgnoreHostKey = "true"
       username = local.username
       paasword = local.paasword
     }
@@ -424,7 +418,7 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
   # Fargate profiles use the cluster primary security group so these are not utilized
   # create_cluster_security_group = false #added from site
-  #  create_node_security_group    = false #added from site
+   #create_node_security_group    = false #added from site
 
 
 
@@ -508,7 +502,7 @@ module "eks" {
     # }
 
     critical-addons-arm = {
-      instance_types = ["t4g.xlarge"]
+      instance_types = ["t4g.small"]
       ami_type       = "AL2023_ARM_64_STANDARD"
 
       min_size     = 1
@@ -613,6 +607,20 @@ module "vpc" {
     # Tags subnets for Karpenter auto-discovery
     "karpenter.sh/discovery" = local.resource_prefix
   }
+
+  tags = local.tags
+}
+
+module "karpenter" {
+  source = "terraform-aws-modules/eks/aws//modules/karpenter"
+
+  cluster_name = module.eks.cluster_name
+
+  create_node_iam_role = false
+  node_iam_role_arn    = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+
+  # Since the node group role will already have an access entry
+  create_access_entry = false
 
   tags = local.tags
 }
