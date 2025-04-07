@@ -290,42 +290,42 @@ resource "kubernetes_secret" "git_secrets" {
 ################################################################################
 # GitOps Bridge: Bootstrap
 ################################################################################
-module "gitops_bridge_bootstrap" {
-  source  = "gitops-bridge-dev/gitops-bridge/helm"
-  version = "0.0.1"
-  cluster = {
-    cluster_name = module.eks.cluster_name
-    environment  = local.environment
-    metadata     = local.addons_metadata
-    addons       = local.addons
-  }
-  apps = local.argocd_apps
-  argocd = {
-    namespace        = local.argocd_namespace
-    chart_version    = local.argocd_chart_version #"5.51.1"
-    timeout          = 600
-    create_namespace = false
-    set = [
-      {
-        name  = "server.service.type"
-        value = "LoadBalancer"
-      },
-      {
-        name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-        value = module.argocd_irsa.iam_role_arn
-      },
-      {
-        name  = "applicationSet.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-        value = module.argocd_irsa.iam_role_arn
-      },
-      {
-        name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-        value = module.argocd_irsa.iam_role_arn
-      }
-    ]
-  }
-  depends_on = [kubernetes_secret.git_secrets]
-}
+# module "gitops_bridge_bootstrap" {
+#   source  = "gitops-bridge-dev/gitops-bridge/helm"
+#   version = "0.0.1"
+#   cluster = {
+#     cluster_name = module.eks.cluster_name
+#     environment  = local.environment
+#     metadata     = local.addons_metadata
+#     addons       = local.addons
+#   }
+#   apps = local.argocd_apps
+#   argocd = {
+#     namespace        = local.argocd_namespace
+#     chart_version    = local.argocd_chart_version #"5.51.1"
+#     timeout          = 600
+#     create_namespace = false
+#     set = [
+#       {
+#         name  = "server.service.type"
+#         value = "LoadBalancer"
+#       },
+#       {
+#         name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       },
+#       {
+#         name  = "applicationSet.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       },
+#       {
+#         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       }
+#     ]
+#   }
+#   depends_on = [kubernetes_secret.git_secrets]
+# }
 
 ################################################################################
 # ArgoCD EKS Access
@@ -618,16 +618,16 @@ module "vpc" {
   tags = local.tags
 }
 
-module "karpenter" {
-  source = "terraform-aws-modules/eks/aws//modules/karpenter"
+# module "karpenter" {
+#   source = "terraform-aws-modules/eks/aws//modules/karpenter"
 
-  cluster_name = module.eks.cluster_name
+#   cluster_name = module.eks.cluster_name
 
-  create_node_iam_role = false
-  node_iam_role_arn    = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+#   create_node_iam_role = false
+#   node_iam_role_arn    = module.eks_blueprints_addons.karpenter.node_iam_role_arn
 
-  # Since the node group role will already have an access entry
-  create_access_entry = false
+#   # Since the node group role will already have an access entry
+#   create_access_entry = false
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
