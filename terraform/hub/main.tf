@@ -187,12 +187,12 @@ locals {
 ################################################################################
 # GitOps Bridge: Private ssh keys for git
 ################################################################################
-resource "kubernetes_namespace" "argocd" {
-  metadata {
-    name = local.argocd_namespace
-  }
-  # depends_on = [module.eks_blueprints_addons, module.eks , aws_eks_access_entry.karpenter_node_access_entry] 
-}
+# resource "kubernetes_namespace" "argocd" {
+#   metadata {
+#     name = local.argocd_namespace
+#   }
+#   # depends_on = [module.eks_blueprints_addons, module.eks , aws_eks_access_entry.karpenter_node_access_entry] 
+# }
 
 # resource "aws_eks_access_entry" "karpenter_node_access_entry" {
 #   cluster_name  = module.eks.cluster_name
@@ -202,7 +202,7 @@ resource "kubernetes_namespace" "argocd" {
 # }
 
 resource "kubernetes_secret" "git_secrets" {
-  depends_on = [kubernetes_namespace.argocd]
+  #depends_on = [kubernetes_namespace.argocd]
   for_each = {
     git-addons = {
       type = "git"
@@ -232,7 +232,7 @@ resource "kubernetes_secret" "git_secrets" {
   }
   metadata {
     name      = each.key
-    namespace = kubernetes_namespace.argocd.metadata[0].name
+    # namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
     }
