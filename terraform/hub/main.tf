@@ -618,16 +618,3 @@ module "vpc" {
   tags = local.tags
 }
 
-# module "karpenter" {
-#   source = "terraform-aws-modules/eks/aws//modules/karpenter"
-
-#   cluster_name = module.eks.cluster_name
-
-#   create_node_iam_role = false
-#   node_iam_role_arn    = module.eks_blueprints_addons.karpenter.node_iam_role_arn
-
-#   # Since the node group role will already have an access entry
-#   create_access_entry = false
-
-#   tags = local.tags
-# }
