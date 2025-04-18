@@ -8,9 +8,9 @@ spec:
     - m5.large
     - m5.medium
   subnetSelector:
-    karpenter.sh/discovery: <your-cluster-name>
+    karpenter.sh/discovery: aknys
   securityGroupSelector:
-    karpenter.sh/discovery: <your-cluster-name>
+    karpenter.sh/discovery: aknys
   zoneSelector:
     karpenter.sh/discovery: "true"
   spotPricing:
