@@ -114,7 +114,7 @@ locals {
     enable_aws_gateway_api_controller            = false
     enable_aws_ebs_csi_resources                 = true # generate gp2 and gp3 storage classes for ebs-csi
     enable_aws_secrets_store_csi_driver_provider = false
-    enable_aws_argocd                            = false
+    enable_aws_argocd                            = true
   }
   oss_addons = {
     enable_argocd             = false # disable default argocd application set, we enable enable_aws_argocd above
@@ -207,7 +207,7 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = local.argocd_namespace
   }
-  depends_on = [module.eks_blueprints_addons, module.eks ] 
+  depends_on = [module.eks_blueprints_addons, module.eks] 
 }
 
 # resource "aws_eks_access_entry" "karpenter_node_access_entry" {
@@ -272,8 +272,8 @@ module "gitops_bridge_bootstrap" {
   argocd = {
     namespace        = local.argocd_namespace
     chart_version    = local.argocd_chart_version #"5.51.1"
-    timeout          = 600
-    create_namespace = false
+    timeout          = 1200
+    create_namespace = false  
     set = [
       {
         name  = "server.service.type"
@@ -293,7 +293,7 @@ module "gitops_bridge_bootstrap" {
       }
     ]
   }
-  depends_on = [kubernetes_secret.git_secrets]
+  depends_on = [kubernetes_secret.git_secrets, kubernetes_namespace.argocd]
 }
 
 ################################################################################
@@ -441,22 +441,22 @@ module "eks" {
 
       min_size     = 1
       max_size     = 2
-      desired_size = 2
+      desired_size = 1
 
       labels = {
         # Used to ensure Karpenter runs on nodes that it does not manage
         "karpenter.sh/controller" = "true"
       }
 
-      taints = {
-        # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
-        # The pods that do not tolerate this taint should run on nodes created by Karpenter
-        addons = {
-          key    = "CriticalAddonsOnly"
-          value  = "true"
-          effect = "NO_SCHEDULE"
-        }
-      }
+      # taints = {
+      #   # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
+      #   # The pods that do not tolerate this taint should run on nodes created by Karpenter
+      #   addons = {
+      #     key    = "CriticalAddonsOnly"
+      #     value  = "false"
+      #     effect = "NO_SCHEDULE"
+      #   }
+      # }
     }
   }
 
