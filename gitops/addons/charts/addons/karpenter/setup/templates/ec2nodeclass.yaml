@@ -1,12 +1,17 @@
-karpenter:
-  nodeClass:
-    - name: "default"
-      provider:
-        instanceTypes:
-          - "m5.large"
-          - "m5.medium"
-        zones:
-          - "us-west-2a"
-          - "us-west-2b"
-        amiFamily: "AmazonLinux2"
-        spotPrice: 0.08
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: default
+spec:
+  amiFamily: AmazonLinux2
+  instanceTypes:
+    - m5.large
+    - m5.medium
+  subnetSelector:
+    karpenter.sh/discovery: <your-cluster-name>
+  securityGroupSelector:
+    karpenter.sh/discovery: <your-cluster-name>
+  zoneSelector:
+    karpenter.sh/discovery: "true"
+  spotPricing:
+    maxPrice: 0.08
