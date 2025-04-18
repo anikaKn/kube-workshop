@@ -1,3 +1,6 @@
+{{- $ec2NodeClass := dict "apiVersion" "karpenter.k8s.aws/v1beta1" "kind" "EC2NodeClass" "name" .Values.nodepool.nodeClassRef.name }}
+{{- $ := mergeOverwrite . (dict "dependencies" (list $ec2NodeClass)) }}
+
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
