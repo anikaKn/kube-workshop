@@ -1,4 +1,3 @@
-{{- if .Values.nodepool.enabled }}
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
@@ -21,4 +20,4 @@ spec:
     cpu: "{{ .Values.nodepool.limits.cpu }}"
     memory: "{{ .Values.nodepool.limits.memory }}"
   weight: {{ .Values.nodepool.weight }}
-{{- end }}
+
