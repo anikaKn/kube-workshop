@@ -1,5 +1,6 @@
 nodepool:
   name: default
+  enabled: false
   nodeClassRef:
     group: karpenter.k8s.aws
     kind: EC2NodeClass
