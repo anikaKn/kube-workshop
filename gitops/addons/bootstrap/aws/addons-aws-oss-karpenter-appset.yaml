@@ -18,7 +18,7 @@ spec:
                 # using oci repostory already configure in argocd
                 # argocd repo add public.ecr.aws --type helm --name aws-public-ecr --enable-oci
                 addonChartRepository: public.ecr.aws
-               # installCRDs: true
+                #installCRDs: true
               selector:
                 matchExpressions:
                   - key: enable_karpenter
@@ -47,7 +47,7 @@ spec:
           ref: values
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
-          path: 'chats/addons/{{values.addonChart}}/setup'
+          path: 'charts/addons/{{values.addonChart}}/setup'
           helm: 
             releaseName: '{{values.addonChart}}-setup-nodes'
             ignoreMissingValueFiles: true
