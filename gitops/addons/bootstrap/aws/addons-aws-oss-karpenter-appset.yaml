@@ -14,7 +14,7 @@ spec:
               values:
                 addonChart: karpenter
                 # anything not staging or prod use this version
-                addonChartVersion: v0.30.0
+                addonChartVersion: v1.1.1
                 # using oci repostory already configure in argocd
                 # argocd repo add public.ecr.aws --type helm --name aws-public-ecr --enable-oci
                 addonChartRepository: public.ecr.aws
@@ -29,13 +29,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: v0.30.0
+                addonChartVersion: v1.1.1
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: v0.30.0
+                addonChartVersion: v1.1.1
   template:
     metadata:
       name: addon-{{name}}-{{values.addonChart}}
