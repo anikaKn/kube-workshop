@@ -18,7 +18,7 @@ spec:
                 # using oci repostory already configure in argocd
                 # argocd repo add public.ecr.aws --type helm --name aws-public-ecr --enable-oci
                 addonChartRepository: public.ecr.aws
-                installCRDs: false  # Disable in main chart since we'll handle separately
+                installCRDs: "false"  # Disable in main chart since we'll handle separately
               selector:
                 matchExpressions:
                   - key: enable_karpenter
@@ -56,7 +56,7 @@ spec:
             ignoreMissingValueFiles: true
             values: |
               webhook:
-                enabled: true
+                enabled: "true"
                 serviceName: karpenter
                 serviceNamespace: '{{metadata.annotations.karpenter_namespace}}'
         
