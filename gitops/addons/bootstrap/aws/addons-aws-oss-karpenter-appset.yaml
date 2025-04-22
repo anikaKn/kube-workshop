@@ -50,7 +50,7 @@ spec:
         # Source 2: CRD Installation (MUST COME FIRST)
         - chart: karpenter/karpenter-crd
           repoURL: '{{values.addonChartRepository}}'
-          targetRevision: '{{values.addonChartVersion}}'
+          targetRevision: 1.4.0 #'{{values.addonChartVersion}}'
           helm:
             releaseName: '{{values.addonChart}}-crd'
             ignoreMissingValueFiles: true
