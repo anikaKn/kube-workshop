@@ -39,3 +39,6 @@ nodepool:
     cpu: "10"
     memory: "10Gi"
   weight: 10
+#clusterName: "aknys"  # Must match EKS cluster name
+#nodes_setup:
+#  node_iam_role_name: "karpenter-aknys-20250422131533562600000019"
