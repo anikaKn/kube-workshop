@@ -9,5 +9,5 @@ spec:
   securityGroupSelectorTerms:  # Keep this
     - tags:
         karpenter.sh/discovery: aknys
-  spotPricing:
-    maxPrice: 0.08
+#  spotPricing:
+#    maxPrice: 0.08
