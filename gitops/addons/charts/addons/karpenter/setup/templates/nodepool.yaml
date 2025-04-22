@@ -1,0 +1,23 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: "default"
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: {{ .Values.nodepool.nodeClassRef.group }}
+        kind: {{ .Values.nodepool.nodeClassRef.kind }}
+        name: {{ .Values.nodepool.nodeClassRef.name }}
+      requirements:
+{{ toYaml .Values.nodepool.requirements | indent 8 }}
+  disruption:
+    consolidationPolicy: {{ .Values.nodepool.disruption.consolidationPolicy }}
+    consolidateAfter: {{ .Values.nodepool.disruption.consolidateAfter }}
+    budgets:
+{{ toYaml .Values.nodepool.disruption.budgets | indent 6 }}
+  limits:
+    cpu: "{{ .Values.nodepool.limits.cpu }}"
+    memory: "{{ .Values.nodepool.limits.memory }}"
+  weight: {{ .Values.nodepool.weight }}
+

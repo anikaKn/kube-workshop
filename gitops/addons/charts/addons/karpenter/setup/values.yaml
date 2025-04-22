@@ -1,4 +1,4 @@
-installCRDs: true
+#installCRDs: true
 nodepool:
   name: default
   nodeClassRef:
