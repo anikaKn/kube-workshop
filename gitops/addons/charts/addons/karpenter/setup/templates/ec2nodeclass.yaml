@@ -3,17 +3,29 @@ kind: EC2NodeClass
 metadata:
   name: "default"
 spec:
+  amiFamily: AL2
+  amiSelectorTerms:
+    - alias: al2@latest  # Use the latest EKS-optimized AL2 AMI
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: aknys     # Replace with your actual tag value
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: aknys     # Replace with your actual tag value
+  # Optional: specify the IAM role or instance profile
+  role: "KarpenterNodeRole-YourClusterName"  # Replace with your IAM role name
+  # Optional: pass kubelet config
   kubelet:
     podsPerCore: 2
     maxPods: 20
     systemReserved:
-        cpu: 100m
-        memory: 100Mi
-        ephemeral-storage: 1Gi
+      cpu: 100m
+      memory: 100Mi
+      ephemeral-storage: 1Gi
     kubeReserved:
-        cpu: 200m
-        memory: 100Mi
-        ephemeral-storage: 3Gi
+      cpu: 200m
+      memory: 100Mi
+      ephemeral-storage: 3Gi
 #   amiFamily: AmazonLinux2
 #   subnetSelectorTerms: 
 #     - tags:
