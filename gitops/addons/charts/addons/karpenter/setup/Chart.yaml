@@ -2,7 +2,8 @@ apiVersion: v2
 name: karpenter-setup
 description: Setup Helm chart for AWS Karpenter node provisioning
 type: application
-version: 0.1.0
+version: 0.2.0
 appVersion: "1.0"
 annotations:
-  "helm.sh/hook": crd-install
+  "helm.sh/hook": crd-install #,pre-install,pre-upgrade
+  "helm.sh/hook-weight": "-5"
