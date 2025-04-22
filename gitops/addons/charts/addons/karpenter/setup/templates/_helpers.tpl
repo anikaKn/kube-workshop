@@ -1,6 +1,7 @@
 {{- define "karpenter-setup.crds" -}}
-{{- range .Files.Glob "crds/*.yaml" }}
+{{- range $path, $bytes := .Files.Glob "crds/*.yaml" }}
+{{- $file := $.Files.Get $path }}
 ---
-{{ .Content | indent 4 }}
+{{ $file | indent 4 }}
 {{- end }}
 {{- end }}
