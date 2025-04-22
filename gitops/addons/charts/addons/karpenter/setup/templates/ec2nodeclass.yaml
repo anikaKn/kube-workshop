@@ -4,12 +4,10 @@ metadata:
   name: "default"
 spec:
   amiFamily: AmazonLinux2
-  subnetSelector:  # Keep this as-is (subnetSelector is still valid)
+  subnetSelector:  # Keep this
     karpenter.sh/discovery: aknys
-  securityGroupSelectorTerms:  # <-- Replace securityGroupSelector
+  securityGroupSelectorTerms:  # Keep this
     - tags:
         karpenter.sh/discovery: aknys
-  zoneSelector:
-    karpenter.sh/discovery: "true"
   spotPricing:
     maxPrice: 0.08
