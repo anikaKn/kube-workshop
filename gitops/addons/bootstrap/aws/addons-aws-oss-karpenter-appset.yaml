@@ -80,26 +80,26 @@ spec:
                 value: '{{metadata.labels.environment}}'
               - name: "nodepool.capacity_type"
                 value: '{{metadata.annotations.karpenter_capacity_type}}'        
-        # - chart: '{{values.addonChart}}/{{values.addonChart}}'
-        #   repoURL: '{{values.addonChartRepository}}'
-        #   targetRevision: '{{values.addonChartVersion}}'
-        #   helm:
-        #     releaseName: '{{values.addonChart}}'
-        #     ignoreMissingValueFiles: true
-        #     valueFiles:
-        #       - $values/{{metadata.annotations.addons_repo_basepath}}charts/addons/{{values.addonChart}}/values.yaml
-        #       - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
-        #       - $values/{{metadata.annotations.addons_repo_basepath}}clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
-        #     values: |
-        #       settings:
-        #         aws:
-        #           clusterName: {{metadata.annotations.aws_cluster_name}}
-        #           defaultInstanceProfile: {{metadata.annotations.karpenter_node_instance_profile_name}}
-        #           interruptionQueueName: {{metadata.annotations.karpenter_sqs_queue_name}}
-        #       serviceAccount:
-        #         name: {{metadata.annotations.karpenter_service_account}}
-        #         annotations:
-        #           eks.amazonaws.com/role-arn: {{metadata.annotations.karpenter_iam_role_arn}}
+        - chart: '{{values.addonChart}}/{{values.addonChart}}'
+          repoURL: '{{values.addonChartRepository}}'
+          targetRevision: 0.16.3 #'{{values.addonChartVersion}}'
+          helm:
+            releaseName: '{{values.addonChart}}'
+            ignoreMissingValueFiles: true
+            valueFiles:
+              - $values/{{metadata.annotations.addons_repo_basepath}}charts/addons/{{values.addonChart}}/setup/values.yaml
+              - $values/{{metadata.annotations.addons_repo_basepath}}environments/{{metadata.labels.environment}}/addons/{{values.addonChart}}/values.yaml
+              - $values/{{metadata.annotations.addons_repo_basepath}}clusters/{{name}}/addons/{{values.addonChart}}/values.yaml
+            values: |
+              settings:
+                aws:
+                  clusterName: {{metadata.annotations.aws_cluster_name}}
+                  defaultInstanceProfile: {{metadata.annotations.karpenter_node_instance_profile_name}}
+                  interruptionQueueName: {{metadata.annotations.karpenter_sqs_queue_name}}
+              serviceAccount:
+                name: {{metadata.annotations.karpenter_service_account}}
+                annotations:
+                  eks.amazonaws.com/role-arn: {{metadata.annotations.karpenter_iam_role_arn}}
       destination:
         namespace: '{{metadata.annotations.karpenter_namespace}}'
         name: '{{name}}'
