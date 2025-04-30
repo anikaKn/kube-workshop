@@ -14,7 +14,7 @@ nodepool:
       values: ["2", "4", "8"]
     - key: "karpenter.k8s.aws/instance-size"
       operator: In
-      values: ["nano", "micro", "medium"]
+      values: ["nano", "micro", "medium", "large"]
     - key: "karpenter.k8s.aws/instance-hypervisor"
       operator: In
       values: ["nitro"]
