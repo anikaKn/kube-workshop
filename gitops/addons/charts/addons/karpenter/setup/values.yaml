@@ -23,10 +23,10 @@ nodepool:
       values: ["us-west-2a", "us-west-2b"]
     - key: "kubernetes.io/arch"
       operator: In
-      values: ["amd64"]
+      values: ["arm64"] #"amd64"
     - key: "karpenter.sh/capacity-type"
       operator: In
-      values: ["spot"]
+      values: ["spot", "on-demand"]
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
     consolidateAfter: 1m

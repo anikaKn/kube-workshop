@@ -436,7 +436,7 @@ module "eks" {
 
   eks_managed_node_groups = {
     critical-addons-arm = {
-      instance_types = ["c5.large"] #"t4g.medium"
+      instance_types = ["c6g.large"] #"t4g.medium"
       ami_type       = "AL2023_ARM_64_STANDARD"
 
       min_size     = 1
