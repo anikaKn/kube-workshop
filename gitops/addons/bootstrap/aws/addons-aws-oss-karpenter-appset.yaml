@@ -82,7 +82,7 @@ spec:
                 value: '{{metadata.annotations.karpenter_capacity_type}}'        
         - chart: '{{values.addonChart}}/{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'
-          targetRevision: 0.16.3 #'{{values.addonChartVersion}}'
+          targetRevision: 1.1.4 #'{{values.addonChartVersion}}'
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
