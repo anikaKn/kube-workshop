@@ -8,13 +8,13 @@ nodepool:
   requirements:
     - key: "karpenter.k8s.aws/instance-family"
       operator: In
-      values: ["t3", "m5", "c5", "r5"]
+      values: ["t3", "m5", "c5", "r5", "t4g"]
     - key: "karpenter.k8s.aws/instance-cpu"
       operator: In
       values: ["2", "4", "8"]
     - key: "karpenter.k8s.aws/instance-size"
       operator: In
-      values: ["nano", "micro"]
+      values: ["nano", "micro", "medium"]
     - key: "karpenter.k8s.aws/instance-hypervisor"
       operator: In
       values: ["nitro"]
