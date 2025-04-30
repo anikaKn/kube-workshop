@@ -8,7 +8,7 @@ nodepool:
   requirements:
     - key: "karpenter.k8s.aws/instance-family"
       operator: In
-      values: ["t3", "m5", "c5", "r5", "t4g"]
+      values: ["t3", "m5", "c5", "r5", "t4g", "m6g", "c6g"]
     - key: "karpenter.k8s.aws/instance-cpu"
       operator: In
       values: ["2", "4", "8"]
