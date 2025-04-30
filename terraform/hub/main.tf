@@ -440,23 +440,23 @@ module "eks" {
       ami_type       = "AL2023_ARM_64_STANDARD"
 
       min_size     = 1
-      max_size     = 2
-      desired_size = 1
+      max_size     = 3
+      desired_size = 2
 
       labels = {
         # Used to ensure Karpenter runs on nodes that it does not manage
         "karpenter.sh/controller" = "true"
       }
 
-      # taints = {
-      #   # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
-      #   # The pods that do not tolerate this taint should run on nodes created by Karpenter
-      #   addons = {
-      #     key    = "CriticalAddonsOnly"
-      #     value  = "false"
-      #     effect = "NO_SCHEDULE"
-      #   }
-      # }
+      taints = { # TODO GTP asked to uncomment
+        # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
+        # The pods that do not tolerate this taint should run on nodes created by Karpenter
+        addons = {
+          key    = "CriticalAddonsOnly"
+          value  = "false"
+          effect = "NO_SCHEDULE"
+        }
+      }
     }
   }
 
