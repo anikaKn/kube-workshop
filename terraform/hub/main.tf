@@ -448,15 +448,15 @@ module "eks" {
         "karpenter.sh/controller" = "true"
       }
 
-      taints = { # TODO GTP asked to uncomment
-        # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
-        # The pods that do not tolerate this taint should run on nodes created by Karpenter
-        addons = {
-          key    = "CriticalAddonsOnly"
-          value  = "false"
-          effect = "NO_SCHEDULE"
-        }
-      }
+      # taints = { # TODO GTP asked to uncomment
+      #   # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
+      #   # The pods that do not tolerate this taint should run on nodes created by Karpenter
+      #   addons = {
+      #     key    = "CriticalAddonsOnly"
+      #     value  = "false"
+      #     effect = "NO_SCHEDULE"
+      #   }
+      # }
     }
   }
 
