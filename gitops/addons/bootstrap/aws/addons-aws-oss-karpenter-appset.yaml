@@ -93,12 +93,21 @@ spec:
             values: |
               settings:
                 clusterName: {{metadata.annotations.aws_cluster_name}}        # <-- Moved clusterName here
+                clusterEndpoint: {{metadata.annotations.karpenter_cluster_endpoint}}
                 defaultInstanceProfile: {{metadata.annotations.karpenter_node_instance_profile_name}}
-                interruptionQueueName: {{metadata.annotations.karpenter_sqs_queue_name}}
+                interruptionQueue: {{metadata.annotations.karpenter_sqs_queue_name}}
               serviceAccount:
                 name: {{metadata.annotations.karpenter_service_account}}
                 annotations:
                   eks.amazonaws.com/role-arn: {{metadata.annotations.karpenter_iam_role_arn}}
+              controller:
+                env:
+                  - name: AWS_REGION
+                    value: {{metadata.annotations.aws_region}}
+                  - name: AWS_DEFAULT_REGION
+                    value: {{metadata.annotations.aws_region}}
+                  - name: AWS_STS_REGIONAL_ENDPOINTS
+                    value: regional
       destination:
         namespace: '{{metadata.annotations.karpenter_namespace}}'
         name: '{{name}}'
