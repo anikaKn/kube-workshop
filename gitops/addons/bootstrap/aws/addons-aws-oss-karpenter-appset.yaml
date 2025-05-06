@@ -82,7 +82,7 @@ spec:
                 value: '{{metadata.annotations.karpenter_capacity_type}}'        
         - chart: '{{values.addonChart}}/{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'
-          targetRevision: '{{metadata.annotations.addons_repo_revision}}' #1.1.4 #'{{values.addonChartVersion}}'
+          targetRevision: 1.1.4 #'{{metadata.annotations.addons_repo_revision}}' #1.1.4 #'{{values.addonChartVersion}}'
           helm:
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
@@ -95,10 +95,6 @@ spec:
                 clusterName: {{metadata.annotations.aws_cluster_name}}        # <-- Moved clusterName here
                 defaultInstanceProfile: {{metadata.annotations.karpenter_node_instance_profile_name}}
                 interruptionQueueName: {{metadata.annotations.karpenter_sqs_queue_name}}
-   #             aws:
-   #               clusterName: {{metadata.annotations.aws_cluster_name}}
-   #               defaultInstanceProfile: {{metadata.annotations.karpenter_node_instance_profile_name}}
-   #               interruptionQueueName: {{metadata.annotations.karpenter_sqs_queue_name}}
               serviceAccount:
                 name: {{metadata.annotations.karpenter_service_account}}
                 annotations:
