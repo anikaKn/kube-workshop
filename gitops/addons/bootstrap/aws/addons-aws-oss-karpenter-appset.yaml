@@ -80,11 +80,11 @@ spec:
                 value: '{{metadata.labels.environment}}'
               - name: "nodepool.capacity_type"
                 value: '{{metadata.annotations.karpenter_capacity_type}}'        
-        - chart: '{{values.addonChart}}/{{values.addonChart}}-crd'
+        - chart: '{{values.addonChart}}/{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'
-          targetRevision: 1.1.4 #'{{values.addonChartVersion}}'
+          targetRevision: '{{metadata.annotations.addons_repo_revision}}' #1.1.4 #'{{values.addonChartVersion}}'
           helm:
-            releaseName: '{{values.addonChart}}-crd'
+            releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:
               - $values/{{metadata.annotations.addons_repo_basepath}}charts/addons/{{values.addonChart}}/setup/values.yaml
