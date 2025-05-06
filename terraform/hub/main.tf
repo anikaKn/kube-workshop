@@ -387,7 +387,7 @@ module "eks_blueprints_addons" {
   karpenter_node = {
     iam_role_use_name_prefix = true
   }
-  
+
 }
 ################################################################################
 # EKS Cluster
@@ -457,7 +457,7 @@ module "eks" {
 
       min_size     = 1
       max_size     = 3
-      desired_size = 1
+      desired_size = 2
 
       labels = {
         # Used to ensure Karpenter runs on nodes that it does not manage
