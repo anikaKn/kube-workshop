@@ -376,6 +376,18 @@ module "eks_blueprints_addons" {
   external_dns_route53_zone_arns      = local.external_dns_route53_zone_arns
 
   tags = local.tags
+
+    karpenter_enable_instance_profile_creation = true
+ 
+  karpenter = {
+    repository_username = data.aws_ecrpublic_authorization_token.token.user_name
+    repository_password = data.aws_ecrpublic_authorization_token.token.password
+  }
+ 
+  karpenter_node = {
+    iam_role_use_name_prefix = true
+  }
+  
 }
 ################################################################################
 # EKS Cluster
