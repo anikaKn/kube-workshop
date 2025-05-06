@@ -16,7 +16,7 @@ spec:
   role: "KarpenterNodeRole-YourClusterName"  # Replace with your IAM role name
   # Optional: pass kubelet config
   kubelet:
-    podsPerCore: 1
+    podsPerCore: 1  # in real project should be 2
     maxPods: 20
     systemReserved:
       cpu: 100m
