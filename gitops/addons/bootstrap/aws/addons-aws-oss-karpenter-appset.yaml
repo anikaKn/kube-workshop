@@ -94,7 +94,6 @@ spec:
               settings:
                 clusterName: {{metadata.annotations.aws_cluster_name}}        # <-- Moved clusterName here
                 clusterEndpoint: {{metadata.annotations.karpenter_cluster_endpoint}}
-                defaultInstanceProfile: {{metadata.annotations.karpenter_node_instance_profile_name}}
                 interruptionQueue: {{metadata.annotations.karpenter_sqs_queue_name}}
               serviceAccount:
                 name: {{metadata.annotations.karpenter_service_account}}
