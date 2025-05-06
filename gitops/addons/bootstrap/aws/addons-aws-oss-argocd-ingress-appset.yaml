@@ -36,7 +36,7 @@ spec:
                 addonChartVersion: 7.3.11
   template:
     metadata:
-      name: addon2-{{.name}}-aws-{{.values.addonChart}} #avoid duplication
+      name: addon-{{.name}}-aws-{{.values.addonChart}}
     spec:
       project: default
       sources:

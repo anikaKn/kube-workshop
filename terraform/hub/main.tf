@@ -20,7 +20,9 @@ provider "aws" {
 data "aws_ecrpublic_authorization_token" "token" {
   provider = aws.virginia
 }
-
+data "aws_secretsmanager_secret_version" "git_token" {
+  secret_id = "arn:aws:secretsmanager:us-west-2:022698001278:secret:aknys-git-token-C8pnBC"
+}
 
 provider "helm" {
   kubernetes {
@@ -65,7 +67,8 @@ locals {
   vpc_cidr        = var.vpc_cidr
 
   username                       = "anikaKn"
-  paasword                       = var.git_token
+  git_token = jsondecode(data.aws_secretsmanager_secret_version.git_token.secret_string).gitToken
+  paasword                       = local.git_token
   argocd_host                    = "itfuture.click" # TODO SET domain
   certificate_arn                = ""               #TODO cert
   external_dns_route53_zone_arns = ["arn:aws:route53:::hostedzone/Z0472995P920M8ZJM6Z2"]
@@ -144,6 +147,7 @@ locals {
       addons_repo_basepath = local.gitops_addons_basepath
       addons_repo_path     = local.gitops_addons_path
       addons_repo_revision = local.gitops_addons_revision
+      aws_cluster_name = local.name
     },
     {
       platform_repo_url      = local.gitops_platform_url
@@ -172,7 +176,7 @@ locals {
       karpenter_cluster_endpoint           = module.eks.cluster_endpoint
       karpenter_namespace                  = "karpenter"
       karpenter_service_account            = "karpenter"
-      karpenter_capacity_type              = "[\"spot\"]"
+      karpenter_capacity_type              = "[\"spot\", \"on-demand\"]"
     }
   )
 
@@ -441,7 +445,7 @@ module "eks" {
 
       min_size     = 1
       max_size     = 3
-      desired_size = 2
+      desired_size = 1
 
       labels = {
         # Used to ensure Karpenter runs on nodes that it does not manage
@@ -532,3 +536,32 @@ module "vpc" {
   tags = local.tags
 }
 
+
+# resource "kubernetes_secret" "incluster_argocd_cluster" {
+#   metadata {
+#     name      = "cluster-https-kubernetes-default-svc"
+#     namespace = "argocd"
+#     annotations = {
+#       "aws_cluster_name" = local.name
+#     }
+#   }
+
+#   data = {
+#     # DO NOT override `data` unless you’re creating the secret from scratch
+#     # If updating only annotations, use `kubectl_patch` instead
+#   }
+
+#   lifecycle {
+#     ignore_changes = [data]
+#   }
+# }
+
+
+# resource "null_resource" "patch_argocd_cluster" {
+#   provisioner "local-exec" {
+#     command = <<EOT
+# kubectl -n argocd annotate secret cluster-https-kubernetes-default-svc \
+#   aws_cluster_name=${local.name} --overwrite
+# EOT
+#   }
+# }
