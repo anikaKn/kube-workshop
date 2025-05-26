@@ -22,6 +22,7 @@ data "aws_ecrpublic_authorization_token" "token" {
 }
 data "aws_secretsmanager_secret_version" "git_token" {
   secret_id = "arn:aws:secretsmanager:us-west-2:022698001278:secret:aknys-git-token-C8pnBC"
+  # secret_id = "arn:aws:secretsmanager:us-east-1:022698001278:secret:aknys-git-token-34nJ5C"
 }
 
 provider "helm" {
@@ -455,7 +456,7 @@ module "eks" {
       instance_types = ["c6g.large"] #"t4g.medium"
       ami_type       = "AL2023_ARM_64_STANDARD"
 
-      min_size     = 1
+      min_size     = 2
       max_size     = 3
       desired_size = 2
 
@@ -499,12 +500,16 @@ module "eks" {
 
   enable_efa_support = true
 
-  tags = {
-    # NOTE - if creating multiple security groups with this module, only tag the
+  tags =  merge(
+  local.tags,
+  {
+      # NOTE - if creating multiple security groups with this module, only tag the
     # security group that Karpenter should utilize with the following tag
     # (i.e. - at most, only one security group should have this tag in your account)
     "karpenter.sh/discovery" = local.resource_prefix
-  }
+  } )
+
+
 }
 
 ################################################################################
