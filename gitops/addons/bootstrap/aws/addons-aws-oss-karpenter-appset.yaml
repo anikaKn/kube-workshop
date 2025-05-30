@@ -76,6 +76,10 @@ spec:
                 value: '{{metadata.annotations.karpenter_node_iam_role_name}}'
               - name: "nodes_setup.cluster_name"
                 value: '{{metadata.annotations.aws_cluster_name}}'
+              - name: "nodes_setup.email"
+                value: '{{metadata.annotations.email}}'
+              # - name: "nodes_setup.role"
+              #   value: '{{metadata.annotations.karpenter_node_iam_role_name}}'
               - name: "nodes_setup.environment"
                 value: '{{metadata.labels.environment}}'
               - name: "nodepool.capacity_type"

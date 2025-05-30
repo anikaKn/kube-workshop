@@ -268,20 +268,23 @@ resource "kubernetes_secret" "git_secrets" {
 module "gitops_bridge_bootstrap" {
   source  = "gitops-bridge-dev/gitops-bridge/helm"
   version = "0.0.1"
+
   cluster = {
     cluster_name = module.eks.cluster_name
     environment  = local.environment
     metadata     = local.addons_metadata
     addons       = local.addons
   }
+
   apps = local.argocd_apps
+
   argocd = {
     namespace        = local.argocd_namespace
-    chart_version    = local.argocd_chart_version #"5.51.1"
+    chart_version    = local.argocd_chart_version
     timeout          = 1200
-    create_namespace = false  
-    recreate_pods  = true
-    force_update  = true
+    create_namespace = false
+    recreate_pods    = true
+    force_update     = true
     set = [
       {
         name  = "server.service.type"
@@ -298,11 +301,117 @@ module "gitops_bridge_bootstrap" {
       {
         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.argocd_irsa.iam_role_arn
+      },
+
+      # Tolerations for all ArgoCD components
+      {
+        name  = "server.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "server.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "controller.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "controller.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "repoServer.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "repoServer.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "applicationSet.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "applicationSet.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "redis.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "redis.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "redis.secretInit.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "redis.secretInit.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "dex.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "dex.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "notifications.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "notifications.tolerations[0].operator"
+        value = "Exists"
       }
     ]
   }
+
   depends_on = [kubernetes_secret.git_secrets, kubernetes_namespace.argocd]
 }
+
+# module "gitops_bridge_bootstrap" {
+#   source  = "gitops-bridge-dev/gitops-bridge/helm"
+#   version = "0.0.1"
+#   cluster = {
+#     cluster_name = module.eks.cluster_name
+#     environment  = local.environment
+#     metadata     = local.addons_metadata
+#     addons       = local.addons
+#   }
+#   apps = local.argocd_apps
+#   argocd = {
+#     namespace        = local.argocd_namespace
+#     chart_version    = local.argocd_chart_version #"5.51.1"
+#     timeout          = 1200
+#     create_namespace = false  
+#     recreate_pods  = true
+#     force_update  = true
+#     set = [
+#       {
+#         name  = "server.service.type"
+#         value = "LoadBalancer"
+#       },
+#       {
+#         name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       },
+#       {
+#         name  = "applicationSet.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       },
+#       {
+#         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       }
+#     ]
+#   }
+#   depends_on = [kubernetes_secret.git_secrets, kubernetes_namespace.argocd]
+# }
 
 ################################################################################
 # ArgoCD EKS Access
