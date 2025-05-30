@@ -302,7 +302,14 @@ module "gitops_bridge_bootstrap" {
         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.argocd_irsa.iam_role_arn
       },
-
+{ name = "controller.tolerations[0].operator", value = "Exists" },
+{ name = "server.tolerations[0].operator", value = "Exists" },
+{ name = "repoServer.tolerations[0].operator", value = "Exists" },
+{ name = "applicationSet.tolerations[0].operator", value = "Exists" },
+{ name = "redis.tolerations[0].operator", value = "Exists" },
+{ name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
+{ name = "dex.tolerations[0].operator", value = "Exists" },
+{ name = "notifications.tolerations[0].operator", value = "Exists" },
       # Standard CriticalAddonsOnly Exists
       { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "controller.tolerations[0].operator", value = "Exists" },
