@@ -131,6 +131,7 @@ locals {
     module.eks_blueprints_addons.gitops_metadata,
     {
       aws_cluster_name = module.eks.cluster_name
+      email = "aknys@softserveinc.com"
       aws_region       = local.region
       aws_account_id   = data.aws_caller_identity.current.account_id
       aws_vpc_id       = module.vpc.vpc_id
@@ -177,7 +178,7 @@ locals {
       karpenter_cluster_endpoint           = module.eks.cluster_endpoint
       karpenter_namespace                  = "karpenter"
       karpenter_service_account            = "karpenter"
-      karpenter_capacity_type              = "[\"spot\", \"on-demand\"]"
+      karpenter_capacity_type              = "[\"spot\"]"  #, \"on-demand\"
     }
   )
 
@@ -279,6 +280,8 @@ module "gitops_bridge_bootstrap" {
     chart_version    = local.argocd_chart_version #"5.51.1"
     timeout          = 1200
     create_namespace = false  
+    recreate_pods  = true
+    force_update  = true
     set = [
       {
         name  = "server.service.type"
@@ -465,15 +468,15 @@ module "eks" {
         "karpenter.sh/controller" = "true"
       }
 
-      # taints = { # TODO GTP asked to uncomment
-      #   # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
-      #   # The pods that do not tolerate this taint should run on nodes created by Karpenter
-      #   addons = {
-      #     key    = "CriticalAddonsOnly"
-      #     value  = "false"
-      #     effect = "NO_SCHEDULE"
-      #   }
-      # }
+      taints = { # TODO GTP asked to uncomment
+        # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
+        # The pods that do not tolerate this taint should run on nodes created by Karpenter
+        addons = {
+          key    = "CriticalAddonsOnly"
+          value  = "false"
+          effect = "NO_SCHEDULE"
+        }
+      }
     }
   }
 

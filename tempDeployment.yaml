@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: nginx-deployment2
 spec:
-  replicas: 50
+  replicas: 10
   selector:
     matchLabels:
       app: nginx
@@ -15,12 +15,12 @@ spec:
       containers:
         - name: nginx
           image: nginx
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "512m"
-            limits:
-              memory: "1024Mi"
-              cpu: "1024m"
+          # resources:
+          #   requests:
+          #     memory: "256Mi"
+          #     cpu: "256m"
+          #   limits:
+          #     memory: "256Mi"
+          #     cpu: "256m"
           ports:
             - containerPort: 80

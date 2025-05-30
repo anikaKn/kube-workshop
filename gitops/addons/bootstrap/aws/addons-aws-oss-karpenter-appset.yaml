@@ -80,10 +80,12 @@ spec:
                 value: '{{metadata.labels.environment}}'
               - name: "nodepool.capacity_type"
                 value: '{{metadata.annotations.karpenter_capacity_type}}'        
+        # Source 4:
         - chart: '{{values.addonChart}}/{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'
           targetRevision: 1.1.4 #'{{metadata.annotations.addons_repo_revision}}' #1.1.4 #'{{values.addonChartVersion}}'
           helm:
+            skipCrds: true
             releaseName: '{{values.addonChart}}'
             ignoreMissingValueFiles: true
             valueFiles:

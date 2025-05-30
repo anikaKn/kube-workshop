@@ -13,7 +13,7 @@ spec:
     - tags:
         karpenter.sh/discovery: aknys     # Replace with your actual tag value
   # Optional: specify the IAM role or instance profile
-  role: "KarpenterNodeRole-YourClusterName"  # Replace with your IAM role name
+  role: "karpenter-aknys-20250526102039114300000007"  # Replace with your IAM role name
   # Optional: pass kubelet config
   kubelet:
     podsPerCore: 1  # in real project should be 2
