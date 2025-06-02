@@ -61,7 +61,10 @@ spec:
                 tolerations:
                   - key: "CriticalAddonsOnly"
                     operator: "Exists"
-
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
               server:
                 serviceAccount:
                   annotations:
@@ -69,30 +72,54 @@ spec:
                 tolerations:
                   - key: "CriticalAddonsOnly"
                     operator: "Exists"
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
 
               repoServer:
                 tolerations:
                   - key: "CriticalAddonsOnly"
                     operator: "Exists"
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
 
               applicationSet:
                 tolerations:
                   - key: "CriticalAddonsOnly"
                     operator: "Exists"
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
 
               redis:
                 tolerations:
                   - key: "CriticalAddonsOnly"
                     operator: "Exists"
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
                 secretInit:
                   tolerations:
                     - key: "CriticalAddonsOnly"
                       operator: "Exists"
+                    - key: "CriticalAddonsOnly"
+                      operator: "Equal"
+                      value: "false"
+                      effect: "NoSchedule"
 
               dex:
                 tolerations:
                   - key: "CriticalAddonsOnly"
                     operator: "Exists"
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
 
               notifications:
                 tolerations:
