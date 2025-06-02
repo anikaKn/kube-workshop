@@ -65,6 +65,7 @@ spec:
                 - key: node.cilium.io/agent-not-ready
                   value: "true"
                   effect: NoSchedule
+                - operator: Exists
       destination:
         namespace: '{{metadata.annotations.aws_cloudwatch_metrics_namespace}}'
         name: '{{name}}'
