@@ -303,161 +303,6 @@ module "gitops_bridge_bootstrap" {
         name  = "server.service.type"
         value = "LoadBalancer"
       },
-      # Controller tolerations
-      {
-        name  = "controller.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "controller.tolerations[0].operator"
-        value = "Equal"
-      },
-      {
-        name  = "controller.tolerations[0].value"
-        value = "false"
-      },
-      {
-        name  = "controller.tolerations[0].effect"
-        value = "NoSchedule"
-      },
-      
-      # Server tolerations
-      {
-        name  = "server.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "server.tolerations[0].operator"
-        value = "Equal"
-      },
-      {
-        name  = "server.tolerations[0].value"
-        value = "false"
-      },
-      {
-        name  = "server.tolerations[0].effect"
-        value = "NoSchedule"
-      },
-      
-      # RepoServer tolerations
-      {
-        name  = "repoServer.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "repoServer.tolerations[0].operator"
-        value = "Equal"
-      },
-      {
-        name  = "repoServer.tolerations[0].value"
-        value = "false"
-      },
-      {
-        name  = "repoServer.tolerations[0].effect"
-        value = "NoSchedule"
-      },
-      
-      # ApplicationSet tolerations
-      {
-        name  = "applicationSet.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "applicationSet.tolerations[0].operator"
-        value = "Equal"
-      },
-      {
-        name  = "applicationSet.tolerations[0].value"
-        value = "false"
-      },
-      {
-        name  = "applicationSet.tolerations[0].effect"
-        value = "NoSchedule"
-      },
-      
-      # Redis tolerations
-      {
-        name  = "redis.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "redis.tolerations[0].operator"
-        value = "Equal"
-      },
-      {
-        name  = "redis.tolerations[0].value"
-        value = "false"
-      },
-      {
-        name  = "redis.tolerations[0].effect"
-        value = "NoSchedule"
-      },
-      
-      # Redis secretInit tolerations
-      {
-        name  = "redis.secretInit.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "redis.secretInit.tolerations[0].operator"
-        value = "Equal"
-      },
-      {
-        name  = "redis.secretInit.tolerations[0].value"
-        value = "false"
-      },
-      {
-        name  = "redis.secretInit.tolerations[0].effect"
-        value = "NoSchedule"
-      },
-      
-      # Dex tolerations
-      {
-        name  = "dex.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "dex.tolerations[0].operator"
-        value = "Equal"
-      },
-      {
-        name  = "dex.tolerations[0].value"
-        value = "false"
-      },
-      {
-        name  = "dex.tolerations[0].effect"
-        value = "NoSchedule"
-      },
-      
-      # Notifications tolerations
-      {
-        name  = "notifications.tolerations[0].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "notifications.tolerations[0].operator"
-        value = "Exists"
-      },
-      {
-        name  = "notifications.tolerations[1].key"
-        value = "CriticalAddonsOnly"
-      },
-      {
-        name  = "notifications.tolerations[1].operator"
-        value = "Equal"
-      },
-      {
-        name  = "notifications.tolerations[1].value"
-        value = "false"
-      },
-      {
-        name  = "notifications.tolerations[1].effect"
-        value = "NoSchedule"
-      }
-    ]
-    
-    set_string = [
-      # Service and IAM role settings
       {
         name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.argocd_irsa.iam_role_arn
@@ -469,7 +314,73 @@ module "gitops_bridge_bootstrap" {
       {
         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.argocd_irsa.iam_role_arn
-      }
+      },
+      # Standard CriticalAddonsOnly Exists
+      { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "controller.tolerations[0].operator", value = "Exists" },
+
+      # CriticalAddonsOnly=false NoSchedule taint
+      { name = "controller.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "controller.tolerations[1].operator", value = "Equal" },
+      { name = "controller.tolerations[1].value", value = "false" },
+      { name = "controller.tolerations[1].effect", value = "NoSchedule" },
+
+      { name = "server.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "server.tolerations[0].operator", value = "Exists" },
+      { name = "server.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "server.tolerations[1].operator", value = "Equal" },
+      { name = "server.tolerations[1].value", value = "false" },
+      { name = "server.tolerations[1].effect", value = "NoSchedule" },
+
+      { name = "repoServer.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "repoServer.tolerations[0].operator", value = "Exists" },
+      { name = "repoServer.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "repoServer.tolerations[1].operator", value = "Equal" },
+      { name = "repoServer.tolerations[1].value", value = "false" },
+      { name = "repoServer.tolerations[1].effect", value = "NoSchedule" },
+
+      { name = "applicationSet.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "applicationSet.tolerations[0].operator", value = "Exists" },
+      { name = "applicationSet.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "applicationSet.tolerations[1].operator", value = "Equal" },
+      { name = "applicationSet.tolerations[1].value", value = "false" },
+      { name = "applicationSet.tolerations[1].effect", value = "NoSchedule" },
+
+      { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "redis.tolerations[0].operator", value = "Exists" },
+      { name = "redis.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "redis.tolerations[1].operator", value = "Equal" },
+      { name = "redis.tolerations[1].value", value = "false" },
+      { name = "redis.tolerations[1].effect", value = "NoSchedule" },
+
+      # Using extraTolerations for secretInit
+      { name = "redis.secretInit.extraTolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.extraTolerations[0].operator", value = "Exists" },
+      { name = "redis.secretInit.extraTolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.extraTolerations[1].operator", value = "Equal" },
+      { name = "redis.secretInit.extraTolerations[1].value", value = "false" },
+      { name = "redis.secretInit.extraTolerations[1].effect", value = "NoSchedule" },
+      
+      { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
+      { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.tolerations[1].operator", value = "Equal" },
+      { name = "redis.secretInit.tolerations[1].value", value = "false" },
+      { name = "redis.secretInit.tolerations[1].effect", value = "NoSchedule" },
+
+      { name = "dex.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "dex.tolerations[0].operator", value = "Exists" },
+      { name = "dex.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "dex.tolerations[1].operator", value = "Equal" },
+      { name = "dex.tolerations[1].value", value = "false" },
+      { name = "dex.tolerations[1].effect", value = "NoSchedule" },
+
+      { name = "notifications.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "notifications.tolerations[0].operator", value = "Exists" },
+      { name = "notifications.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "notifications.tolerations[1].operator", value = "Equal" },
+      { name = "notifications.tolerations[1].value", value = "false" },
+      { name = "notifications.tolerations[1].effect", value = "NoSchedule" }
     ]
   }
 
