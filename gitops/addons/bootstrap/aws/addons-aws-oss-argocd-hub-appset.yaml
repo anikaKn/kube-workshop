@@ -65,6 +65,12 @@ spec:
                     operator: "Equal"
                     value: "false"
                     effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
               server:
                 serviceAccount:
                   annotations:
@@ -76,6 +82,12 @@ spec:
                     operator: "Equal"
                     value: "false"
                     effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
 
               repoServer:
                 tolerations:
@@ -85,6 +97,12 @@ spec:
                     operator: "Equal"
                     value: "false"
                     effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
 
               applicationSet:
                 tolerations:
@@ -94,6 +112,12 @@ spec:
                     operator: "Equal"
                     value: "false"
                     effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
 
               redis:
                 tolerations:
@@ -103,6 +127,12 @@ spec:
                     operator: "Equal"
                     value: "false"
                     effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
                 secretInit:
                   tolerations:
                     - key: "CriticalAddonsOnly"
@@ -111,6 +141,12 @@ spec:
                       operator: "Equal"
                       value: "false"
                       effect: "NoSchedule"
+                    - key: CriticalAddonsOnly
+                      value: "true"
+                      effect: NoSchedule
+                    - key: node.cilium.io/agent-not-ready
+                      value: "true"
+                      effect: NoSchedule
 
               dex:
                 tolerations:
@@ -120,11 +156,27 @@ spec:
                     operator: "Equal"
                     value: "false"
                     effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
 
               notifications:
                 tolerations:
                   - key: "CriticalAddonsOnly"
                     operator: "Exists"
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
       destination:
         namespace: '{{default "argocd" .metadata.annotations.argocd_namespace}}'
         name: '{{.name}}'

@@ -62,6 +62,13 @@ spec:
                 serviceAccount:
                   annotations:
                     eks.amazonaws.com/role-arn: '{{.metadata.annotations.argocd_iam_role_arn}}'
+                tolerations:
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                  effect: NoSchedule
                 service:
                   type: "ClusterIP"
                 ingress:
