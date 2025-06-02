@@ -68,7 +68,7 @@ locals {
   vpc_cidr        = var.vpc_cidr
 
   username                       = "anikaKn"
-  git_token = jsondecode(data.aws_secretsmanager_secret_version.git_token.secret_string).gitToken
+  git_token                      = jsondecode(data.aws_secretsmanager_secret_version.git_token.secret_string).gitToken
   paasword                       = local.git_token
   argocd_host                    = "itfuture.click" # TODO SET domain
   certificate_arn                = ""               #TODO cert
@@ -123,7 +123,7 @@ locals {
   oss_addons = {
     enable_argocd             = false # disable default argocd application set, we enable enable_aws_argocd above
     enable_aws_argocd_ingress = true
-    enable_metrics_server = true
+    enable_metrics_server     = true
   }
   addons = merge(local.aws_addons, local.oss_addons, { kubernetes_version = local.cluster_version }, { aws_cluster_name = module.eks.cluster_name })
 
@@ -131,7 +131,7 @@ locals {
     module.eks_blueprints_addons.gitops_metadata,
     {
       aws_cluster_name = module.eks.cluster_name
-      email = "aknys@softserveinc.com"
+      email            = "aknys@softserveinc.com"
       aws_region       = local.region
       aws_account_id   = data.aws_caller_identity.current.account_id
       aws_vpc_id       = module.vpc.vpc_id
@@ -149,7 +149,7 @@ locals {
       addons_repo_basepath = local.gitops_addons_basepath
       addons_repo_path     = local.gitops_addons_path
       addons_repo_revision = local.gitops_addons_revision
-      aws_cluster_name = local.name
+      aws_cluster_name     = local.name
     },
     {
       platform_repo_url      = local.gitops_platform_url
@@ -168,7 +168,7 @@ locals {
       manifest_repo_basepath = local.gitops_manifest_basepath
       manifest_repo_path     = local.gitops_manifest_path
       manifest_repo_revision = local.gitops_manifest_revision
-    }, 
+    },
     {
       karpenter_node_instance_profile_name = module.eks_blueprints_addons.karpenter.node_instance_profile_name
       karpenter_node_iam_role_name         = module.eks_blueprints_addons.karpenter.node_iam_role_name
@@ -178,7 +178,7 @@ locals {
       karpenter_cluster_endpoint           = module.eks.cluster_endpoint
       karpenter_namespace                  = "karpenter"
       karpenter_service_account            = "karpenter"
-      karpenter_capacity_type              = "[\"spot\"]"  #, \"on-demand\"
+      karpenter_capacity_type              = "[\"spot\"]" #, \"on-demand\"
     }
   )
 
@@ -187,8 +187,8 @@ locals {
     platform = file("${path.module}/bootstrap/platform.yaml")
   }
 
-  azs = slice(data.aws_availability_zones.available.names, 0, 3)
-  resource_prefix="aknys"
+  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
+  resource_prefix = "aknys"
   kubernetes_admins = [
     {
       userarn    = "arn:aws:iam::022698001278:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
@@ -213,7 +213,7 @@ resource "kubernetes_namespace" "argocd" {
   metadata {
     name = local.argocd_namespace
   }
-  depends_on = [module.eks_blueprints_addons, module.eks] 
+  depends_on = [module.eks_blueprints_addons, module.eks]
 }
 
 # resource "aws_eks_access_entry" "karpenter_node_access_entry" {
@@ -227,33 +227,33 @@ resource "kubernetes_secret" "git_secrets" {
   #depends_on = [kubernetes_namespace.argocd]
   for_each = {
     git-addons = {
-      type = "git"
-      url  = local.gitops_addons_url
+      type     = "git"
+      url      = local.gitops_addons_url
       username = local.username
       paasword = local.paasword
     }
     git-platform = {
-      type = "git"
-      url  = local.gitops_platform_url
+      type     = "git"
+      url      = local.gitops_platform_url
       username = local.username
       paasword = local.paasword
     }
     git-workloads = {
-      type = "git"
-      url  = local.gitops_workload_url
+      type     = "git"
+      url      = local.gitops_workload_url
       username = local.username
       paasword = local.paasword
     }
     git-manifest = {
-      type = "git"
-      url  = local.gitops_manifest_url
+      type     = "git"
+      url      = local.gitops_manifest_url
       username = local.username
       paasword = local.paasword
     }
 
   }
   metadata {
-    name      = each.key
+    name = each.key
     # namespace = kubernetes_namespace.argocd.metadata[0].name
     labels = {
       "argocd.argoproj.io/secret-type" = "repository"
@@ -262,6 +262,9 @@ resource "kubernetes_secret" "git_secrets" {
   data = each.value
 }
 
+################################################################################
+# GitOps Bridge: Bootstrap
+################################################################################
 ################################################################################
 # GitOps Bridge: Bootstrap
 ################################################################################
@@ -302,14 +305,14 @@ module "gitops_bridge_bootstrap" {
         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.argocd_irsa.iam_role_arn
       },
-{ name = "controller.tolerations[0].operator", value = "Exists" },
-{ name = "server.tolerations[0].operator", value = "Exists" },
-{ name = "repoServer.tolerations[0].operator", value = "Exists" },
-{ name = "applicationSet.tolerations[0].operator", value = "Exists" },
-{ name = "redis.tolerations[0].operator", value = "Exists" },
-{ name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
-{ name = "dex.tolerations[0].operator", value = "Exists" },
-{ name = "notifications.tolerations[0].operator", value = "Exists" },
+      { name = "controller.tolerations[0].operator", value = "Exists" },
+      { name = "server.tolerations[0].operator", value = "Exists" },
+      { name = "repoServer.tolerations[0].operator", value = "Exists" },
+      { name = "applicationSet.tolerations[0].operator", value = "Exists" },
+      { name = "redis.tolerations[0].operator", value = "Exists" },
+      { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
+      { name = "dex.tolerations[0].operator", value = "Exists" },
+      { name = "notifications.tolerations[0].operator", value = "Exists" },
       # Standard CriticalAddonsOnly Exists
       { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "controller.tolerations[0].operator", value = "Exists" },
@@ -348,6 +351,14 @@ module "gitops_bridge_bootstrap" {
       { name = "redis.tolerations[1].value", value = "false" },
       { name = "redis.tolerations[1].effect", value = "NoSchedule" },
 
+      # 🛠️ Updated to use extraTolerations for secretInit (fix for InitContainer tainting)
+      { name = "redis.secretInit.extraTolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.extraTolerations[0].operator", value = "Exists" },
+      { name = "redis.secretInit.extraTolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.extraTolerations[1].operator", value = "Equal" },
+      { name = "redis.secretInit.extraTolerations[1].value", value = "false" },
+      { name = "redis.secretInit.extraTolerations[1].effect", value = "NoSchedule" },
+      # Redis secretInit2
       { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
       { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
@@ -373,6 +384,7 @@ module "gitops_bridge_bootstrap" {
 
   depends_on = [kubernetes_secret.git_secrets, kubernetes_namespace.argocd]
 }
+
 
 # module "gitops_bridge_bootstrap" {
 #   source  = "gitops-bridge-dev/gitops-bridge/helm"
@@ -490,13 +502,13 @@ module "eks_blueprints_addons" {
 
   tags = local.tags
 
-    karpenter_enable_instance_profile_creation = true
- 
+  karpenter_enable_instance_profile_creation = true
+
   karpenter = {
     repository_username = data.aws_ecrpublic_authorization_token.token.user_name
     repository_password = data.aws_ecrpublic_authorization_token.token.password
   }
- 
+
   karpenter_node = {
     iam_role_use_name_prefix = true
   }
@@ -518,7 +530,7 @@ module "eks" {
   subnet_ids = module.vpc.private_subnets
   # Fargate profiles use the cluster primary security group so these are not utilized
   # create_cluster_security_group = false #added from site
-   #create_node_security_group    = false #added from site
+  #create_node_security_group    = false #added from site
 
 
 
@@ -541,7 +553,7 @@ module "eks" {
       type        = "ingress"
     }
   }
-    node_security_group_additional_rules = {
+  node_security_group_additional_rules = {
     nodes_istiod_port = {
       description                   = "Cluster API to Node group for istiod webhook"
       protocol                      = "tcp"
@@ -612,14 +624,14 @@ module "eks" {
 
   enable_efa_support = true
 
-  tags =  merge(
-  local.tags,
-  {
+  tags = merge(
+    local.tags,
+    {
       # NOTE - if creating multiple security groups with this module, only tag the
-    # security group that Karpenter should utilize with the following tag
-    # (i.e. - at most, only one security group should have this tag in your account)
-    "karpenter.sh/discovery" = local.resource_prefix
-  } )
+      # security group that Karpenter should utilize with the following tag
+      # (i.e. - at most, only one security group should have this tag in your account)
+      "karpenter.sh/discovery" = local.resource_prefix
+  })
 
 
 }

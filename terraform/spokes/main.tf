@@ -275,11 +275,11 @@ module "eks_blueprints_addons" {
 
   tags = local.tags
 
-    # Wait for all Cert-manager related resources to be ready
-  cert_manager = {  # comment ?
+  # Wait for all Cert-manager related resources to be ready
+  cert_manager = { # comment ?
     wait = true
   }
-  cert_manager_route53_hosted_zone_arns = local.route53_hosted_zone_arns  # comment ?
+  cert_manager_route53_hosted_zone_arns = local.route53_hosted_zone_arns # comment ?
 
   # Turn off mutation webhook for services to avoid ordering issue
   aws_load_balancer_controller = { # comment ?
