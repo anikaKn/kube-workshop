@@ -197,6 +197,18 @@ locals {
     }
   ]
 
+ critical_addons_tolerations = [
+    {
+      key      = "CriticalAddonsOnly"
+      operator = "Exists"
+    },
+    {
+      key      = "CriticalAddonsOnly"
+      operator = "Equal"
+      value    = "false"
+      effect   = "NoSchedule"
+    }
+  ]
 
   tags = {
     Blueprint  = local.name
@@ -265,9 +277,6 @@ resource "kubernetes_secret" "git_secrets" {
 ################################################################################
 # GitOps Bridge: Bootstrap
 ################################################################################
-################################################################################
-# GitOps Bridge: Bootstrap
-################################################################################
 module "gitops_bridge_bootstrap" {
   source  = "gitops-bridge-dev/gitops-bridge/helm"
   version = "0.0.1"
@@ -288,11 +297,167 @@ module "gitops_bridge_bootstrap" {
     create_namespace = false
     recreate_pods    = true
     force_update     = true
+
     set = [
       {
         name  = "server.service.type"
         value = "LoadBalancer"
       },
+      # Controller tolerations
+      {
+        name  = "controller.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "controller.tolerations[0].operator"
+        value = "Equal"
+      },
+      {
+        name  = "controller.tolerations[0].value"
+        value = "false"
+      },
+      {
+        name  = "controller.tolerations[0].effect"
+        value = "NoSchedule"
+      },
+      
+      # Server tolerations
+      {
+        name  = "server.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "server.tolerations[0].operator"
+        value = "Equal"
+      },
+      {
+        name  = "server.tolerations[0].value"
+        value = "false"
+      },
+      {
+        name  = "server.tolerations[0].effect"
+        value = "NoSchedule"
+      },
+      
+      # RepoServer tolerations
+      {
+        name  = "repoServer.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "repoServer.tolerations[0].operator"
+        value = "Equal"
+      },
+      {
+        name  = "repoServer.tolerations[0].value"
+        value = "false"
+      },
+      {
+        name  = "repoServer.tolerations[0].effect"
+        value = "NoSchedule"
+      },
+      
+      # ApplicationSet tolerations
+      {
+        name  = "applicationSet.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "applicationSet.tolerations[0].operator"
+        value = "Equal"
+      },
+      {
+        name  = "applicationSet.tolerations[0].value"
+        value = "false"
+      },
+      {
+        name  = "applicationSet.tolerations[0].effect"
+        value = "NoSchedule"
+      },
+      
+      # Redis tolerations
+      {
+        name  = "redis.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "redis.tolerations[0].operator"
+        value = "Equal"
+      },
+      {
+        name  = "redis.tolerations[0].value"
+        value = "false"
+      },
+      {
+        name  = "redis.tolerations[0].effect"
+        value = "NoSchedule"
+      },
+      
+      # Redis secretInit tolerations
+      {
+        name  = "redis.secretInit.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "redis.secretInit.tolerations[0].operator"
+        value = "Equal"
+      },
+      {
+        name  = "redis.secretInit.tolerations[0].value"
+        value = "false"
+      },
+      {
+        name  = "redis.secretInit.tolerations[0].effect"
+        value = "NoSchedule"
+      },
+      
+      # Dex tolerations
+      {
+        name  = "dex.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "dex.tolerations[0].operator"
+        value = "Equal"
+      },
+      {
+        name  = "dex.tolerations[0].value"
+        value = "false"
+      },
+      {
+        name  = "dex.tolerations[0].effect"
+        value = "NoSchedule"
+      },
+      
+      # Notifications tolerations
+      {
+        name  = "notifications.tolerations[0].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "notifications.tolerations[0].operator"
+        value = "Exists"
+      },
+      {
+        name  = "notifications.tolerations[1].key"
+        value = "CriticalAddonsOnly"
+      },
+      {
+        name  = "notifications.tolerations[1].operator"
+        value = "Equal"
+      },
+      {
+        name  = "notifications.tolerations[1].value"
+        value = "false"
+      },
+      {
+        name  = "notifications.tolerations[1].effect"
+        value = "NoSchedule"
+      }
+    ]
+    
+    set_string = [
+      # Service and IAM role settings
       {
         name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.argocd_irsa.iam_role_arn
@@ -304,86 +469,133 @@ module "gitops_bridge_bootstrap" {
       {
         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
         value = module.argocd_irsa.iam_role_arn
-      },
-      { name = "controller.tolerations[0].operator", value = "Exists" },
-      { name = "server.tolerations[0].operator", value = "Exists" },
-      { name = "repoServer.tolerations[0].operator", value = "Exists" },
-      { name = "applicationSet.tolerations[0].operator", value = "Exists" },
-      { name = "redis.tolerations[0].operator", value = "Exists" },
-      { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
-      { name = "dex.tolerations[0].operator", value = "Exists" },
-      { name = "notifications.tolerations[0].operator", value = "Exists" },
-      # Standard CriticalAddonsOnly Exists
-      { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "controller.tolerations[0].operator", value = "Exists" },
-
-      # CriticalAddonsOnly=false NoSchedule taint
-      { name = "controller.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "controller.tolerations[1].operator", value = "Equal" },
-      { name = "controller.tolerations[1].value", value = "false" },
-      { name = "controller.tolerations[1].effect", value = "NoSchedule" },
-
-      { name = "server.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "server.tolerations[0].operator", value = "Exists" },
-      { name = "server.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "server.tolerations[1].operator", value = "Equal" },
-      { name = "server.tolerations[1].value", value = "false" },
-      { name = "server.tolerations[1].effect", value = "NoSchedule" },
-
-      { name = "repoServer.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "repoServer.tolerations[0].operator", value = "Exists" },
-      { name = "repoServer.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "repoServer.tolerations[1].operator", value = "Equal" },
-      { name = "repoServer.tolerations[1].value", value = "false" },
-      { name = "repoServer.tolerations[1].effect", value = "NoSchedule" },
-
-      { name = "applicationSet.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "applicationSet.tolerations[0].operator", value = "Exists" },
-      { name = "applicationSet.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "applicationSet.tolerations[1].operator", value = "Equal" },
-      { name = "applicationSet.tolerations[1].value", value = "false" },
-      { name = "applicationSet.tolerations[1].effect", value = "NoSchedule" },
-
-      { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "redis.tolerations[0].operator", value = "Exists" },
-      { name = "redis.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "redis.tolerations[1].operator", value = "Equal" },
-      { name = "redis.tolerations[1].value", value = "false" },
-      { name = "redis.tolerations[1].effect", value = "NoSchedule" },
-
-      # 🛠️ Updated to use extraTolerations for secretInit (fix for InitContainer tainting)
-      { name = "redis.secretInit.extraTolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "redis.secretInit.extraTolerations[0].operator", value = "Exists" },
-      { name = "redis.secretInit.extraTolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "redis.secretInit.extraTolerations[1].operator", value = "Equal" },
-      { name = "redis.secretInit.extraTolerations[1].value", value = "false" },
-      { name = "redis.secretInit.extraTolerations[1].effect", value = "NoSchedule" },
-      # Redis secretInit2
-      { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
-      { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "redis.secretInit.tolerations[1].operator", value = "Equal" },
-      { name = "redis.secretInit.tolerations[1].value", value = "false" },
-      { name = "redis.secretInit.tolerations[1].effect", value = "NoSchedule" },
-
-      { name = "dex.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "dex.tolerations[0].operator", value = "Exists" },
-      { name = "dex.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "dex.tolerations[1].operator", value = "Equal" },
-      { name = "dex.tolerations[1].value", value = "false" },
-      { name = "dex.tolerations[1].effect", value = "NoSchedule" },
-
-      { name = "notifications.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "notifications.tolerations[0].operator", value = "Exists" },
-      { name = "notifications.tolerations[1].key", value = "CriticalAddonsOnly" },
-      { name = "notifications.tolerations[1].operator", value = "Equal" },
-      { name = "notifications.tolerations[1].value", value = "false" },
-      { name = "notifications.tolerations[1].effect", value = "NoSchedule" }
+      }
     ]
   }
 
   depends_on = [kubernetes_secret.git_secrets, kubernetes_namespace.argocd]
 }
+
+
+
+
+
+# module "gitops_bridge_bootstrap" {
+#   source  = "gitops-bridge-dev/gitops-bridge/helm"
+#   version = "0.0.1"
+
+#   cluster = {
+#     cluster_name = module.eks.cluster_name
+#     environment  = local.environment
+#     metadata     = local.addons_metadata
+#     addons       = local.addons
+#   }
+
+#   apps = local.argocd_apps
+
+#   argocd = {
+#     namespace        = local.argocd_namespace
+#     chart_version    = local.argocd_chart_version
+#     timeout          = 1200
+#     create_namespace = false
+#     recreate_pods    = true
+#     force_update     = true
+#     set = [
+#       {
+#         name  = "server.service.type"
+#         value = "LoadBalancer"
+#       },
+#       {
+#         name  = "server.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       },
+#       {
+#         name  = "applicationSet.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       },
+#       {
+#         name  = "controller.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+#         value = module.argocd_irsa.iam_role_arn
+#       },
+#       { name = "controller.tolerations[0].operator", value = "Exists" },
+#       { name = "server.tolerations[0].operator", value = "Exists" },
+#       { name = "repoServer.tolerations[0].operator", value = "Exists" },
+#       { name = "applicationSet.tolerations[0].operator", value = "Exists" },
+#       { name = "redis.tolerations[0].operator", value = "Exists" },
+#       { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
+#       { name = "dex.tolerations[0].operator", value = "Exists" },
+#       { name = "notifications.tolerations[0].operator", value = "Exists" },
+#       # Standard CriticalAddonsOnly Exists
+#       { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "controller.tolerations[0].operator", value = "Exists" },
+
+#       # CriticalAddonsOnly=false NoSchedule taint
+#       { name = "controller.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "controller.tolerations[1].operator", value = "Equal" },
+#       { name = "controller.tolerations[1].value", value = "false" },
+#       { name = "controller.tolerations[1].effect", value = "NoSchedule" },
+
+#       { name = "server.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "server.tolerations[0].operator", value = "Exists" },
+#       { name = "server.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "server.tolerations[1].operator", value = "Equal" },
+#       { name = "server.tolerations[1].value", value = "false" },
+#       { name = "server.tolerations[1].effect", value = "NoSchedule" },
+
+#       { name = "repoServer.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "repoServer.tolerations[0].operator", value = "Exists" },
+#       { name = "repoServer.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "repoServer.tolerations[1].operator", value = "Equal" },
+#       { name = "repoServer.tolerations[1].value", value = "false" },
+#       { name = "repoServer.tolerations[1].effect", value = "NoSchedule" },
+
+#       { name = "applicationSet.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "applicationSet.tolerations[0].operator", value = "Exists" },
+#       { name = "applicationSet.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "applicationSet.tolerations[1].operator", value = "Equal" },
+#       { name = "applicationSet.tolerations[1].value", value = "false" },
+#       { name = "applicationSet.tolerations[1].effect", value = "NoSchedule" },
+
+#       { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "redis.tolerations[0].operator", value = "Exists" },
+#       { name = "redis.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "redis.tolerations[1].operator", value = "Equal" },
+#       { name = "redis.tolerations[1].value", value = "false" },
+#       { name = "redis.tolerations[1].effect", value = "NoSchedule" },
+
+#       # 🛠️ Updated to use extraTolerations for secretInit (fix for InitContainer tainting)
+#       { name = "redis.secretInit.extraTolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "redis.secretInit.extraTolerations[0].operator", value = "Exists" },
+#       { name = "redis.secretInit.extraTolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "redis.secretInit.extraTolerations[1].operator", value = "Equal" },
+#       { name = "redis.secretInit.extraTolerations[1].value", value = "false" },
+#       { name = "redis.secretInit.extraTolerations[1].effect", value = "NoSchedule" },
+#       # Redis secretInit2
+#       { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
+#       { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "redis.secretInit.tolerations[1].operator", value = "Equal" },
+#       { name = "redis.secretInit.tolerations[1].value", value = "false" },
+#       { name = "redis.secretInit.tolerations[1].effect", value = "NoSchedule" },
+
+#       { name = "dex.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "dex.tolerations[0].operator", value = "Exists" },
+#       { name = "dex.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "dex.tolerations[1].operator", value = "Equal" },
+#       { name = "dex.tolerations[1].value", value = "false" },
+#       { name = "dex.tolerations[1].effect", value = "NoSchedule" },
+
+#       { name = "notifications.tolerations[0].key", value = "CriticalAddonsOnly" },
+#       { name = "notifications.tolerations[0].operator", value = "Exists" },
+#       { name = "notifications.tolerations[1].key", value = "CriticalAddonsOnly" },
+#       { name = "notifications.tolerations[1].operator", value = "Equal" },
+#       { name = "notifications.tolerations[1].value", value = "false" },
+#       { name = "notifications.tolerations[1].effect", value = "NoSchedule" }
+#     ]
+#   }
+
+#   depends_on = [kubernetes_secret.git_secrets, kubernetes_namespace.argocd]
+# }
 
 
 # module "gitops_bridge_bootstrap" {
