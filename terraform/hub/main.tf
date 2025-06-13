@@ -333,22 +333,22 @@ module "gitops_bridge_bootstrap" {
     force_update     = true
 
     set = [
-      {
-        name  = "controller.rbac.namespaced"
-        value = "false"
-      },
-      {
-        name  = "controller.clusterRole.create"
-        value = "true"
-      },
-      {
-        name  = "controller.serviceAccount.create"
-        value = "true"
-      },
-      {
-        name  = "controller.rbac.create"
-        value = "true"
-      },
+      # {  GPT
+      #   name  = "controller.rbac.namespaced"
+      #   value = "false"
+      # },
+      # {
+      #   name  = "controller.clusterRole.create"
+      #   value = "true"
+      # },
+      # {
+      #   name  = "controller.serviceAccount.create"
+      #   value = "true"
+      # },
+      # {
+      #   name  = "controller.rbac.create"
+      #   value = "true"
+      # },
       {
         name  = "server.service.type"
         value = "LoadBalancer"
@@ -369,30 +369,70 @@ module "gitops_bridge_bootstrap" {
       # Global tolerations for all components
       { name = "global.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "global.tolerations[0].operator", value = "Exists" },
+      { name = "global.tolerations[0].effect", value = "NoSchedule" },
       ####{ name = "global.tolerations[0].effect", value = "NoSchedule" },
       
-      # Redis secret init tolerations
+      { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "redis.tolerations[0].operator", value = "Exists" },
+      { name = "redis.secretInit.tolerations[0].effect", value = "NoSchedule" },
+      # { name = "redis.tolerations[1].key", value = "CriticalAddonsOnly" },
+      # { name = "redis.tolerations[1].operator", value = "Equal" },
+      # { name = "redis.tolerations[1].value", value = "false" },
+      # { name = "redis.tolerations[1].effect", value = "NoSchedule" },
+
+      # # Using extraTolerations for secretInit
+      { name = "redis.secretInit.extraTolerations[0].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.extraTolerations[0].operator", value = "Exists" },
+      # { name = "redis.secretInit.extraTolerations[1].key", value = "CriticalAddonsOnly" },
+      # { name = "redis.secretInit.extraTolerations[1].operator", value = "Equal" },
+      # { name = "redis.secretInit.extraTolerations[1].value", value = "false" },
+      # { name = "redis.secretInit.extraTolerations[1].effect", value = "NoSchedule" },
+      
       { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
-      { name = "redis.secretInit.tolerations[0].effect", value = "NoSchedule" }, 
+      # { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
+      # { name = "redis.secretInit.tolerations[1].operator", value = "Equal" },
+      # { name = "redis.secretInit.tolerations[1].value", value = "false" },
+      # { name = "redis.secretInit.tolerations[1].effect", value = "NoSchedule" }
+
+      # GPT
+      # # Redis secret init tolerations
+      # { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
+      # { name = "redis.secretInit.tolerations[0].effect", value = "NoSchedule" }, 
 
 
-      { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "server.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "repoServer.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "applicationSet.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "dex.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "notifications.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "server.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "repoServer.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "applicationSet.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "dex.tolerations[0].key", value = "CriticalAddonsOnly" },
+      # { name = "notifications.tolerations[0].key", value = "CriticalAddonsOnly" },
 
 
-      { name = "controller.tolerations[0].operator", value = "Exists" },
-      { name = "server.tolerations[0].operator", value = "Exists" },
-      { name = "repoServer.tolerations[0].operator", value = "Exists" },
-      { name = "applicationSet.tolerations[0].operator", value = "Exists" },
-      { name = "redis.tolerations[0].operator", value = "Exists" },
-      { name = "dex.tolerations[0].operator", value = "Exists" },
-      { name = "notifications.tolerations[0].operator", value = "Exists" },
+      # { name = "controller.tolerations[0].operator", value = "Exists" },
+      # { name = "server.tolerations[0].operator", value = "Exists" },
+      # { name = "repoServer.tolerations[0].operator", value = "Exists" },
+      # { name = "applicationSet.tolerations[0].operator", value = "Exists" },
+      # { name = "redis.tolerations[0].operator", value = "Exists" },
+      # { name = "dex.tolerations[0].operator", value = "Exists" },
+      # { name = "notifications.tolerations[0].operator", value = "Exists" },
+
+
+      # Add global toleration for the specific taint
+      { name = "global.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "global.tolerations[1].operator", value = "Equal" },
+      # { name = "global.tolerations[1].value", value = "false" },
+      { name = "global.tolerations[1].effect", value = "NoSchedule" },
+
+      # Add specific tolerations for redis-secret-init
+      { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
+      { name = "redis.secretInit.tolerations[1].operator", value = "Equal" },
+      # { name = "redis.secretInit.tolerations[1].value", value = "false" },
+      { name = "redis.secretInit.tolerations[1].effect", value = "NoSchedule" },
+
+
     ]
   }
 
