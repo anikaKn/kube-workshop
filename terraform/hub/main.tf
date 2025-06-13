@@ -350,12 +350,6 @@ module "gitops_bridge_bootstrap" {
         value = "true"
       },
       {
-        name  = "controller.clusterRole.name"
-        value = "argo-cd-argocd-application-controller"
-      }, 
-
-
-      {
         name  = "server.service.type"
         value = "LoadBalancer"
       },
@@ -375,25 +369,19 @@ module "gitops_bridge_bootstrap" {
       # Global tolerations for all components
       { name = "global.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "global.tolerations[0].operator", value = "Exists" },
-      # { name = "global.tolerations[1].key", value = "CriticalAddonsOnly" },
-      # { name = "global.tolerations[1].operator", value = "Equal" },
-      # { name = "global.tolerations[1].value", value = "false" },
-      # { name = "global.tolerations[1].effect", value = "NoSchedule" },
+      ####{ name = "global.tolerations[0].effect", value = "NoSchedule" },
       
       # Redis secret init tolerations
       { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
-      # { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
-      # { name = "redis.secretInit.tolerations[1].operator", value = "Equal" },
-      # { name = "redis.secretInit.tolerations[1].value", value = "false" },
-      # { name = "redis.secretInit.tolerations[1].effect", value = "NoSchedule" }
+      { name = "redis.secretInit.tolerations[0].effect", value = "NoSchedule" }, 
+
 
       { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "server.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "repoServer.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "applicationSet.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
-      { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "dex.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "notifications.tolerations[0].key", value = "CriticalAddonsOnly" },
 
@@ -403,7 +391,6 @@ module "gitops_bridge_bootstrap" {
       { name = "repoServer.tolerations[0].operator", value = "Exists" },
       { name = "applicationSet.tolerations[0].operator", value = "Exists" },
       { name = "redis.tolerations[0].operator", value = "Exists" },
-      { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
       { name = "dex.tolerations[0].operator", value = "Exists" },
       { name = "notifications.tolerations[0].operator", value = "Exists" },
     ]
