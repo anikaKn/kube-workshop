@@ -113,13 +113,6 @@ spec:
                     value: {{metadata.annotations.aws_region}}
                   - name: AWS_STS_REGIONAL_ENDPOINTS
                     value: regional
-                tolerations:
-                  - key: CriticalAddonsOnly
-                    value: "true"
-                    effect: NoSchedule
-                  - key: node.cilium.io/agent-not-ready
-                    value: "true"
-                    effect: NoSchedule
       destination:
         namespace: '{{metadata.annotations.karpenter_namespace}}'
         name: '{{name}}'

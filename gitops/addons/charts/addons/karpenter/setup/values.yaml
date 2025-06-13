@@ -12,21 +12,21 @@ nodepool:
     - key: "karpenter.k8s.aws/instance-category"
       operator: In
       values: ["t", "m", "c", "r"] 
-    - key: "karpenter.k8s.aws/instance-cpu"
-      operator: In
-      values: ["2", "4", "8"]
-    # - key: "karpenter.k8s.aws/instance-size"
+    # - key: "karpenter.k8s.aws/instance-cpu"
     #   operator: In
-    #   values: ["micro", "medium", "large"]
-    - key: "karpenter.k8s.aws/instance-hypervisor"
+    #   values: ["2", "4", "8"]
+    - key: "karpenter.k8s.aws/instance-size"
       operator: In
-      values: ["nitro"]
+      values: ["micro", "medium"] # , "large"
+    # - key: "karpenter.k8s.aws/instance-hypervisor"
+    #   operator: In
+    #   values: ["nitro"]
     - key: "topology.kubernetes.io/zone"
       operator: In
       values: ["us-west-2a", "us-west-2b"]
     - key: "kubernetes.io/arch"
       operator: In
-      values: ["amd64"] #"amd64" "arm64", 
+      values: ["amd64", "arm64"] #"amd64" "arm64",  ### ADded "arm64"
     - key: "karpenter.sh/capacity-type"
       operator: In
       values: ["on-demand"] #, "on-demand" "spot", 

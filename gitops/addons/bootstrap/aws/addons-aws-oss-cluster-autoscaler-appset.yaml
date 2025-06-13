@@ -117,13 +117,6 @@ spec:
                   name: {{metadata.annotations.cluster_autoscaler_service_account}}
                   annotations:
                     eks.amazonaws.com/role-arn: {{metadata.annotations.cluster_autoscaler_iam_role_arn}}
-              tolerations:
-                - key: CriticalAddonsOnly
-                  value: "true"
-                  effect: NoSchedule
-                - key: node.cilium.io/agent-not-ready
-                  value: "true"
-                  effect: NoSchedule
       destination:
         namespace: '{{metadata.annotations.cluster_autoscaler_namespace}}'
         name: '{{name}}'

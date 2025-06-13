@@ -17,6 +17,7 @@ terraform -chdir=$SCRIPTDIR output -raw configure_kubectl > "$TMPFILE"
 # fi
 
 
+
 terraform -chdir=$SCRIPTDIR destroy -target="module.gitops_bridge_bootstrap" -auto-approve
 terraform -chdir=$SCRIPTDIR destroy -target="module.eks_blueprints_addons" -auto-approve
 terraform -chdir=$SCRIPTDIR destroy -target="module.eks" -auto-approve

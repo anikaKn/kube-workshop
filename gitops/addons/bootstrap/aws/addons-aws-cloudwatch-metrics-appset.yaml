@@ -58,14 +58,6 @@ spec:
                 name: {{metadata.annotations.aws_cloudwatch_metrics_service_account}}
                 annotations:
                   eks.amazonaws.com/role-arn: {{metadata.annotations.aws_cloudwatch_metrics_iam_role_arn}}
-              tolerations:
-                - key: CriticalAddonsOnly
-                  value: "true"
-                  effect: NoSchedule
-                - key: node.cilium.io/agent-not-ready
-                  value: "true"
-                  effect: NoSchedule
-                - operator: Exists
       destination:
         namespace: '{{metadata.annotations.aws_cloudwatch_metrics_namespace}}'
         name: '{{name}}'
