@@ -197,18 +197,19 @@ locals {
     }
   ]
 
- critical_addons_tolerations = [
-    {
-      key      = "CriticalAddonsOnly"
-      operator = "Exists"
-    },
-    {
-      key      = "CriticalAddonsOnly"
-      operator = "Equal"
-      value    = "false"
-      effect   = "NoSchedule"
-    }
-  ]
+#  critical_addons_tolerations = [
+#     {
+#       key      = "CriticalAddonsOnly"
+#       operator = "Exists"
+#       effect   = "NoSchedule"
+#     },
+#     {
+#       key      = "CriticalAddonsOnly"
+#       operator = "Equal"
+#       value    = "false"
+#       effect   = "NoSchedule"
+#     }
+#   ]
 
   tags = {
     Blueprint  = local.name
@@ -313,7 +314,7 @@ resource "kubernetes_secret" "git_secrets" {
 ################################################################################
 module "gitops_bridge_bootstrap" {
   source  = "gitops-bridge-dev/gitops-bridge/helm"
-  version = "0.0.1"
+  version = "0.1.0"
 
   cluster = {
     cluster_name = module.eks.cluster_name
