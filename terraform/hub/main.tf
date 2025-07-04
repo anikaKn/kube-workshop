@@ -181,7 +181,9 @@ locals {
       karpenter_capacity_type              = "[\"spot\"]" #, \"on-demand\"
     }
   )
-
+  argocd_tolerations_yaml = templatefile("${path.module}/argocd-tolerations.yaml.tmpl", {
+    iam_role_arn = module.argocd_irsa.iam_role_arn
+  })
   argocd_apps = {
     addons   = file("${path.module}/bootstrap/addons.yaml")
     platform = file("${path.module}/bootstrap/platform.yaml")
@@ -197,19 +199,19 @@ locals {
     }
   ]
 
-#  critical_addons_tolerations = [
-#     {
-#       key      = "CriticalAddonsOnly"
-#       operator = "Exists"
-#       effect   = "NoSchedule"
-#     },
-#     {
-#       key      = "CriticalAddonsOnly"
-#       operator = "Equal"
-#       value    = "false"
-#       effect   = "NoSchedule"
-#     }
-#   ]
+  #  critical_addons_tolerations = [
+  #     {
+  #       key      = "CriticalAddonsOnly"
+  #       operator = "Exists"
+  #       effect   = "NoSchedule"
+  #     },
+  #     {
+  #       key      = "CriticalAddonsOnly"
+  #       operator = "Equal"
+  #       value    = "false"
+  #       effect   = "NoSchedule"
+  #     }
+  #   ]
 
   tags = {
     Blueprint  = local.name
@@ -333,7 +335,8 @@ module "gitops_bridge_bootstrap" {
     recreate_pods    = true
     force_update     = true
 
-    values = [file("${path.module}/argocd-tolerations.yaml")]
+    values = [local.argocd_tolerations_yaml]
+
   }
 
   depends_on = [kubernetes_secret.git_secrets, kubernetes_namespace.argocd]
@@ -475,7 +478,7 @@ module "gitops_bridge_bootstrap" {
 #     namespace        = local.argocd_namespace
 #     chart_version    = local.argocd_chart_version #"5.51.1"
 #     timeout          = 1200
-#     create_namespace = false  
+#     create_namespace = false
 #     recreate_pods  = true
 #     force_update  = true
 #     set = [

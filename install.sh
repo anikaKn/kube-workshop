@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
 export AWS_DEFAULT_REGION="us-west-2"
-export WORKING_DIR=$PWD 
+export WORKING_DIR=$PWD
 export WORKSHOP_DIR=$PWD
 export GITOPS_DIR="$WORKING_DIR/gitops-repos"
 #git clone https://github.com/aws-samples/argocd-on-amazon-eks-workshop $WORKSHOP_DIR

@@ -77,4 +77,3 @@ Create the name of the NetworkPolicy to deny all incoming traffic
 {{- define "team.networkPolicy.ingress.deny.all.name" }}
 {{- printf "%s-%s" ((include "team.fullname" .) | trunc 46 | trimSuffix "-") "ingress-deny-all" }}
 {{- end }}
-

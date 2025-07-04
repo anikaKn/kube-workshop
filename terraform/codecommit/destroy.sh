@@ -18,4 +18,3 @@ else
   echo "FAILED: Terraform destroy of all targets failed"
   exit 1
 fi
-

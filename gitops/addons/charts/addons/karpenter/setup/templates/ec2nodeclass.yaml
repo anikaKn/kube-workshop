@@ -15,7 +15,7 @@ spec:
   # Optional: specify the IAM role or instance profile
   role: {{ .Values.nodes_setup.node_iam_role_name }}  # Replace with your IAM role name
   # Optional: pass kubelet config
-  tags: 
+  tags:
     karpenter.sh/discovery: {{ .Values.nodes_setup.cluster_name }}
     Owner: {{ .Values.nodes_setup.email }}
     Schedule: running
@@ -31,7 +31,7 @@ spec:
       memory: 100Mi
       ephemeral-storage: 3Gi
 #   amiFamily: AmazonLinux2
-#   subnetSelectorTerms: 
+#   subnetSelectorTerms:
 #     - tags:
 #         karpenter.sh/discovery: aknys
 #   securityGroupSelectorTerms:

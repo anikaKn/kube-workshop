@@ -46,7 +46,7 @@ spec:
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           ref: values
-        
+
         # Source 2: CRD Installation (MUST COME FIRST)
         - chart: karpenter/karpenter-crd
           repoURL: '{{values.addonChartRepository}}'
@@ -59,12 +59,12 @@ spec:
                 enabled: "true"
                 serviceName: karpenter
                 serviceNamespace: '{{metadata.annotations.karpenter_namespace}}'
-        
+
         # Source 3: Node Setup
         - repoURL: '{{metadata.annotations.addons_repo_url}}'
           targetRevision: '{{metadata.annotations.addons_repo_revision}}'
           path: 'charts/addons/{{values.addonChart}}/setup'
-          helm: 
+          helm:
             releaseName: '{{values.addonChart}}-setup-nodes'
             ignoreMissingValueFiles: true
             valueFiles:
@@ -83,7 +83,7 @@ spec:
               - name: "nodes_setup.environment"
                 value: '{{metadata.labels.environment}}'
               - name: "nodepool.capacity_type"
-                value: '{{metadata.annotations.karpenter_capacity_type}}'        
+                value: '{{metadata.annotations.karpenter_capacity_type}}'
         # Source 4:
         - chart: '{{values.addonChart}}/{{values.addonChart}}'
           repoURL: '{{values.addonChartRepository}}'

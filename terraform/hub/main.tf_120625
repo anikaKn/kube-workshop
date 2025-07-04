@@ -323,7 +323,7 @@ module "gitops_bridge_bootstrap" {
       { name = "global.tolerations[1].operator", value = "Equal" },
       { name = "global.tolerations[1].value", value = "\"false\"" },
       { name = "global.tolerations[1].effect", value = "NoSchedule" },
-      
+
       # Redis secret init tolerations
       { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
@@ -473,7 +473,7 @@ module "gitops_bridge_bootstrap" {
 #     namespace        = local.argocd_namespace
 #     chart_version    = local.argocd_chart_version #"5.51.1"
 #     timeout          = 1200
-#     create_namespace = false  
+#     create_namespace = false
 #     recreate_pods  = true
 #     force_update  = true
 #     set = [

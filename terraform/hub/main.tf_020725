@@ -372,7 +372,7 @@ module "gitops_bridge_bootstrap" {
       { name = "global.tolerations[0].operator", value = "Exists" },
       { name = "global.tolerations[0].effect", value = "NoSchedule" },
       ####{ name = "global.tolerations[0].effect", value = "NoSchedule" },
-      
+
       { name = "redis.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "redis.tolerations[0].operator", value = "Exists" },
       { name = "redis.secretInit.tolerations[0].effect", value = "NoSchedule" },
@@ -388,7 +388,7 @@ module "gitops_bridge_bootstrap" {
       # { name = "redis.secretInit.extraTolerations[1].operator", value = "Equal" },
       # { name = "redis.secretInit.extraTolerations[1].value", value = "false" },
       # { name = "redis.secretInit.extraTolerations[1].effect", value = "NoSchedule" },
-      
+
       { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
       { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
       # { name = "redis.secretInit.tolerations[1].key", value = "CriticalAddonsOnly" },
@@ -400,7 +400,7 @@ module "gitops_bridge_bootstrap" {
       # # Redis secret init tolerations
       # { name = "redis.secretInit.tolerations[0].key", value = "CriticalAddonsOnly" },
       # { name = "redis.secretInit.tolerations[0].operator", value = "Exists" },
-      # { name = "redis.secretInit.tolerations[0].effect", value = "NoSchedule" }, 
+      # { name = "redis.secretInit.tolerations[0].effect", value = "NoSchedule" },
 
 
       # { name = "controller.tolerations[0].key", value = "CriticalAddonsOnly" },
@@ -576,7 +576,7 @@ module "gitops_bridge_bootstrap" {
 #     namespace        = local.argocd_namespace
 #     chart_version    = local.argocd_chart_version #"5.51.1"
 #     timeout          = 1200
-#     create_namespace = false  
+#     create_namespace = false
 #     recreate_pods  = true
 #     force_update  = true
 #     set = [

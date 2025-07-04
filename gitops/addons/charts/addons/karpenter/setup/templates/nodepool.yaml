@@ -20,4 +20,3 @@ spec:
     cpu: "{{ .Values.nodepool.limits.cpu }}"
     memory: "{{ .Values.nodepool.limits.memory }}"
   weight: {{ .Values.nodepool.weight }}
-

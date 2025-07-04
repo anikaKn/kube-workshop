@@ -16,7 +16,7 @@ spec:
       keyType: HASH
   globalSecondaryIndexes:
   - indexName: idx_global_customerId
-    keySchema: 
+    keySchema:
     - attributeName: customerId
       keyType: HASH
     projection:

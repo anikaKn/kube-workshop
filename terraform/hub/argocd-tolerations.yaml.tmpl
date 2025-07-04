@@ -1,0 +1,116 @@
+dex:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
+notifications:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
+applicationController:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
+redis:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+  secretInit:
+    tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "false"
+        effect: "NoSchedule"
+    extraTolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "false"
+        effect: "NoSchedule"
+redisSecretInit:
+    tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "false"
+        effect: "NoSchedule"
+
+
+server:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+  service:
+    type: LoadBalancer
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
+applicationSet:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
+controller:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+dex:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
