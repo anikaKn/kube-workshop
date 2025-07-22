@@ -1,39 +1,3 @@
-dex:
-  tolerations:
-    - key: "CriticalAddonsOnly"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "CriticalAddonsOnly"
-      operator: "Equal"
-      value: "false"
-      effect: "NoSchedule"
-  serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: ${iam_role_arn}
-notifications:
-  tolerations:
-    - key: "CriticalAddonsOnly"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "CriticalAddonsOnly"
-      operator: "Equal"
-      value: "false"
-      effect: "NoSchedule"
-  serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: ${iam_role_arn}
-applicationController:
-  tolerations:
-    - key: "CriticalAddonsOnly"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "CriticalAddonsOnly"
-      operator: "Equal"
-      value: "false"
-      effect: "NoSchedule"
-  serviceAccount:
-    annotations:
-      eks.amazonaws.com/role-arn: ${iam_role_arn}
 redis:
   tolerations:
     - key: "CriticalAddonsOnly"
@@ -65,9 +29,7 @@ redisSecretInit:
         operator: "Equal"
         value: "false"
         effect: "NoSchedule"
-
-
-server:
+global:
   tolerations:
     - key: "CriticalAddonsOnly"
       operator: "Exists"
@@ -76,41 +38,18 @@ server:
       operator: "Equal"
       value: "false"
       effect: "NoSchedule"
+
+server:
   service:
     type: LoadBalancer
   serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: ${iam_role_arn}
 applicationSet:
-  tolerations:
-    - key: "CriticalAddonsOnly"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "CriticalAddonsOnly"
-      operator: "Equal"
-      value: "false"
-      effect: "NoSchedule"
   serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: ${iam_role_arn}
 controller:
-  tolerations:
-    - key: "CriticalAddonsOnly"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "CriticalAddonsOnly"
-      operator: "Equal"
-      value: "false"
-      effect: "NoSchedule"
-dex:
-  tolerations:
-    - key: "CriticalAddonsOnly"
-      operator: "Exists"
-      effect: "NoSchedule"
-    - key: "CriticalAddonsOnly"
-      operator: "Equal"
-      value: "false"
-      effect: "NoSchedule"
   serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: ${iam_role_arn}
