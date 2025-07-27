@@ -265,12 +265,12 @@ resource "kubernetes_namespace" "argocd" {
 # }
 
 
-# resource "aws_eks_access_entry" "karpenter_node_access_entry" {
-#   cluster_name  = module.eks.cluster_name
-#   principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
-#   kubernetes_groups = []
-#   # type = "EC2_LINUX"
-# }
+resource "aws_eks_access_entry" "karpenter_node_access_entry" {
+  cluster_name  = module.eks.cluster_name
+  principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+  kubernetes_groups = []
+  # type = "EC2_LINUX"
+}
 
 resource "kubernetes_secret" "git_secrets" {
   #depends_on = [kubernetes_namespace.argocd]
@@ -452,7 +452,7 @@ module "eks" {
   # create_cluster_security_group = false #added from site
   #create_node_security_group    = false #added from site
 
-
+authentication_mode = "API_AND_CONFIG_MAP"  ## TODO changed 22.07.24 
 
   # Combine root account, current user/role and additinoal roles to be able to access the cluster KMS key - required for terraform updates
   kms_key_administrators = distinct(concat([
