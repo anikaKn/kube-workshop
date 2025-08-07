@@ -212,12 +212,16 @@ locals {
   #       effect   = "NoSchedule"
   #     }
   #   ]
+  # existing_map_roles = lookup(data.kubernetes_config_map.aws_auth.data, "mapRoles", "")
+
 
   tags = {
     Blueprint  = local.name
     GithubRepo = "github.com/csantanapr/terraform-gitops-bridge"
     Owner      = "aknys@softserveinc.com"
     Schedule   = "running" #"utc-06:00-16:00"
+    # "karpenter.sh/discovery" = local.name # PUBLIC SUBNET should not have this tag!!!!, 
+    # "kubernetes.io/cluster/aknys" = "shared"
   }
 }
 
@@ -265,12 +269,186 @@ resource "kubernetes_namespace" "argocd" {
 # }
 
 
+
+
+# resource "kubernetes_cluster_role" "node_get_csinode" {
+#   metadata {
+#     name = "node-get-csinodes"
+#   }
+
+#   rule {
+#     api_groups = ["storage.k8s.io"]
+#     resources  = ["csinodes"]
+#     verbs      = ["get"]
+#   }
+#   rule {
+#     api_groups = [""]
+#     resources  = ["nodes", "services"]
+#     verbs      = ["get", "list", "watch"]
+#   }
+#   rule {
+#     api_groups = ["storage.k8s.io"]
+#     resources  = ["csinodes"]
+#     verbs      = ["get", "list", "watch"]
+#   }
+#   rule {
+#     api_groups = ["coordination.k8s.io"]
+#     resources  = ["leases"]
+#     verbs      = ["get", "list", "watch", "create", "update"]
+#   }
+
+
+# }
+
+# resource "kubernetes_cluster_role_binding" "node_get_csinode_binding" {
+#   metadata {
+#     name = "node-get-csinodes-binding"
+#   }
+
+#   subject {
+#     kind      = "Group"
+#     name      = "system:nodes"
+#     api_group = "rbac.authorization.k8s.io"
+#   }
+
+#   role_ref {
+#     kind     = "ClusterRole"
+#     name     = kubernetes_cluster_role.node_get_csinode.metadata[0].name
+#     api_group = "rbac.authorization.k8s.io"
+#   }
+# }
+
+
+
+# resource "kubernetes_config_map" "aws_auth" {
+#   metadata {
+#     name      = "aws-auth"
+#     namespace = "kube-system"
+#   }
+#   data = {
+#     mapRoles = yamlencode([
+#       {
+#         rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+#         username = "system:node:{{EC2PrivateDNSName}}"
+#         groups   = ["system:bootstrappers", "system:nodes"]
+#       }
+#       # additional mappings...
+#     ])
+#   }
+#   depends_on = [module.eks]
+# }
+
+
+# data "kubernetes_config_map" "aws_auth" {
+#   metadata {
+#     name      = "aws-auth"
+#     namespace = "kube-system"
+#   }
+# }
+
+# # Prepare your additional mapRoles entry as YAML string via template
+# data "template_file" "new_map_roles" {
+#   template = <<EOF
+# ${local.existing_map_roles}
+
+# - rolearn: ${module.eks_blueprints_addons.karpenter.node_iam_role_arn}
+#   username: system:node:{{EC2PrivateDNSName}}
+#   groups:
+#     - system:bootstrappers
+#     - system:nodes
+# EOF
+# }
+
+# # Example to output the new combined mapRoles - you can use this rendered template
+# output "updated_map_roles" {
+#   value = data.template_file.new_map_roles.rendered
+# }
+
+
+
 resource "aws_eks_access_entry" "karpenter_node_access_entry" {
   cluster_name  = module.eks.cluster_name
   principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
-  kubernetes_groups = []
+  user_name = "karpenter-node"
+  kubernetes_groups   = [
+      "karpenter-nodes",
+    # "system:bootstrappers",
+    # "system:nodes"
+  ]
+  # # kubernetes_groups = []
   # type = "EC2_LINUX"
 }
+
+# 2. RBAC binding in Kubernetes
+resource "kubernetes_cluster_role_binding" "karpenter_nodes" {
+  metadata {
+    name = "karpenter-nodes-binding"
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "system:node"
+  }
+
+  subject {
+    kind      = "Group"
+    name      = "karpenter-nodes"
+    api_group = "rbac.authorization.k8s.io"
+  }
+}
+
+
+# resource "aws_eks_access_policy_association" "karpenter_node" { # NEW 
+#   cluster_name  = module.eks.cluster_name
+#   principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+#   # policy_arn    = "arn:aws:eks:us-west-2::cluster-access-policy/AmazonEKSNodePolicy" # <-- update region here
+#   policy_arn    = "arn:aws:eks:us-west-2:aws:cluster-access-policy/AmazonEKSNodePolicy"
+
+
+#   access_scope {
+#     type = "cluster"
+#   }
+# }
+
+# resource "kubernetes_config_map" "aws_auth" {
+#   metadata {
+#     name      = "aws-auth"
+#     namespace = "kube-system"
+#   }
+
+# data = {
+#   mapRoles = yamlencode([
+#     # Karpenter node IAM role
+#     {
+#       rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+#       username = "system:node:{{EC2PrivateDNSName}}"
+#       groups   = [
+#         "system:bootstrappers",
+#         "system:nodes"
+#       ]
+#     },
+#     # EKS managed node group role (replace with your actual role ARN)
+#     {
+#       rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aknys-critical-addons-arm20250731165617886800000003"
+#       username = "system:node:{{EC2PrivateDNSName}}"
+#       groups   = [
+#         "system:bootstrappers",
+#         "system:nodes"
+#       ]
+#     },
+#     # (Optional) Admin IAM role for kubectl access
+#     {
+#       rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
+#       username = "admin"
+#       groups   = [
+#         "system:masters"
+#       ]
+#     }
+#     # ...add more node or admin roles as needed...
+#   ])
+# }
+# }
 
 resource "kubernetes_secret" "git_secrets" {
   #depends_on = [kubernetes_namespace.argocd]
@@ -420,7 +598,14 @@ module "eks_blueprints_addons" {
   enable_aws_gateway_api_controller   = try(local.aws_addons.enable_aws_gateway_api_controller, false)
   external_dns_route53_zone_arns      = local.external_dns_route53_zone_arns
 
-  tags = local.tags
+
+tags = local.tags
+  #   tags = merge(
+  #   local.tags,
+  #   {
+  #     "karpenter.sh/discovery" = "aknys"
+  #   }
+  # )
 
   karpenter_enable_instance_profile_creation = true
 
@@ -431,6 +616,9 @@ module "eks_blueprints_addons" {
 
   karpenter_node = {
     iam_role_use_name_prefix = true
+    iam_role_additional_policies = [
+      "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+    ]
   }
 
 }
@@ -440,7 +628,7 @@ module "eks_blueprints_addons" {
 #tfsec:ignore:aws-eks-enable-control-plane-logging
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.33"
+  version = "~> 20.33" #"~> 20.4" # "~> 20.33"
 
   cluster_name                   = local.resource_prefix
   cluster_version                = local.cluster_version
@@ -452,7 +640,76 @@ module "eks" {
   # create_cluster_security_group = false #added from site
   #create_node_security_group    = false #added from site
 
-authentication_mode = "API_AND_CONFIG_MAP"  ## TODO changed 22.07.24 
+  authentication_mode = "API_AND_CONFIG_MAP"  ## TODO changed 22.07.24 
+
+#  create_node_iam_role = false
+# node_iam_role_arn    =  module.eks_blueprints_addons.karpenter.node_iam_role_arn
+#   # Since the node group role will already have an access entry
+#   create_access_entry = false
+
+
+#   manage_aws_auth = true
+# aws_auth_roles = [
+#   {
+#     rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+#     username = "system:node:{{EC2PrivateDNSName}}"
+#     groups   = [
+#       "system:bootstrappers",
+#       "system:nodes"
+#     ]
+#   },
+#   {
+#     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aknys-critical-addons-arm20250731165617886800000003"
+#     username = "system:node:{{EC2PrivateDNSName}}"
+#     groups   = [
+#       "system:bootstrappers",
+#       "system:nodes"
+#     ]
+#   },
+#   {
+#     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
+#     username = "admin"
+#     groups   = [
+#       "system:masters"
+#     ]
+#   }
+# ]
+
+
+
+  # manage_aws_auth_configmap = true
+  #  aws_auth_roles = [
+  #   {
+  #     rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+  #     username = "system:node:{{EC2PrivateDNSName}}"
+  #     groups   = [
+  #       "system:bootstrappers",
+  #       "system:nodes"
+  #     ]
+  #   },
+  #   {
+  #     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aknys-critical-addons-arm20250731165617886800000003"
+  #     username = "system:node:{{EC2PrivateDNSName}}"
+  #     groups   = [
+  #       "system:bootstrappers",
+  #       "system:nodes"
+  #     ]
+  #   },
+  #   {
+  #     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
+  #     username = "admin"
+  #     groups   = [
+  #       "system:masters"
+  #     ]
+  #   }
+  # ] // <-- Add this closing bracket here
+
+
+
+
+
+
+
 
   # Combine root account, current user/role and additinoal roles to be able to access the cluster KMS key - required for terraform updates
   kms_key_administrators = distinct(concat([
