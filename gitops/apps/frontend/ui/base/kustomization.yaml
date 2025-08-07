@@ -7,4 +7,3 @@ resources:
 - deployment.yaml
 - hpa.yaml
 - nlb.yaml
-

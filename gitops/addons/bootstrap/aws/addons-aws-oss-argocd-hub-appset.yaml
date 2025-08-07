@@ -15,7 +15,7 @@ spec:
               values:
                 addonChart: argo-cd
                 # anything not staging or prod use this version
-                addonChartVersion: 5.51.1
+                addonChartVersion: 7.3.11
                 addonChartRepository: https://argoproj.github.io/argo-helm
               selector:
                 matchExpressions:
@@ -27,13 +27,13 @@ spec:
                 matchLabels:
                   environment: staging
               values:
-                addonChartVersion: 5.51.1
+                addonChartVersion: 7.3.11
           - clusters:
               selector:
                 matchLabels:
                   environment: prod
               values:
-                addonChartVersion: 5.51.1
+                addonChartVersion: 7.3.11
   template:
     metadata:
       name: addon-{{.name}}-aws-{{.values.addonChart}}
@@ -58,6 +58,20 @@ spec:
                 serviceAccount:
                   annotations:
                     eks.amazonaws.com/role-arn: '{{.metadata.annotations.argocd_iam_role_arn}}'
+               tolerations:Add commentMore actions
+                  - key: "CriticalAddonsOnly"
+                    operator: "Exists"
+                    effect: "NoSchedule"
+                  - key: "CriticalAddonsOnly"
+                    operator: "Equal"
+                    value: "false"
+                    effect: "NoSchedule"
+                  - key: CriticalAddonsOnly
+                    value: "true"
+                    effect: NoSchedule
+                  - key: node.cilium.io/agent-not-ready
+                    value: "true"
+                    effect: NoSchedule
               server:
                 serviceAccount:
                   annotations:

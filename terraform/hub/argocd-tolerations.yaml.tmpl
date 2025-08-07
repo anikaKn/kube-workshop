@@ -1,0 +1,55 @@
+redis:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+  secretInit:
+    tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "false"
+        effect: "NoSchedule"
+    extraTolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "false"
+        effect: "NoSchedule"
+redisSecretInit:
+    tolerations:
+      - key: "CriticalAddonsOnly"
+        operator: "Exists"
+        effect: "NoSchedule"
+      - key: "CriticalAddonsOnly"
+        operator: "Equal"
+        value: "false"
+        effect: "NoSchedule"
+global:
+  tolerations:
+    - key: "CriticalAddonsOnly"
+      operator: "Exists"
+      effect: "NoSchedule"
+    - key: "CriticalAddonsOnly"
+      operator: "Equal"
+      value: "false"
+      effect: "NoSchedule"
+
+server:
+  service:
+    type: LoadBalancer
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
+applicationSet:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}
+controller:
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: ${iam_role_arn}

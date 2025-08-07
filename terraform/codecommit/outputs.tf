@@ -112,4 +112,3 @@ output "gitops_manifest_revision" {
   description = "Git repository revision/branch/ref for manifest"
   value       = var.gitops_manifest_revision
 }
-

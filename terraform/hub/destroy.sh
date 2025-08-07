@@ -10,11 +10,12 @@ ROOTDIR="$(cd ${SCRIPTDIR}/../..; pwd )"
 TMPFILE=$(mktemp)
 terraform -chdir=$SCRIPTDIR output -raw configure_kubectl > "$TMPFILE"
 # check if TMPFILE contains the string "No outputs found"
-if [[ ! $(cat $TMPFILE) == *"No outputs found"* ]]; then
-  echo "No outputs found, skipping kubectl delete"
-  source "$TMPFILE"
-  kubectl delete svc -n argocd argo-cd-argocd-server
-fi
+# if [[ ! $(cat $TMPFILE) == *"No outputs found"* ]]; then
+#   echo "No outputs found, skipping kubectl delete"
+#   source "$TMPFILE"
+#   kubectl delete svc -n argocd argo-cd-argocd-server
+# fi
+
 
 
 terraform -chdir=$SCRIPTDIR destroy -target="module.gitops_bridge_bootstrap" -auto-approve

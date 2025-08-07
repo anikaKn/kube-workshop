@@ -7,7 +7,7 @@ variable "vpc_cidr" {
 variable "kubernetes_version" {
   description = "EKS version"
   type        = string
-  default     = "1.27"
+  default     = "1.32"
 }
 
 variable "aws_auth_roles" {
@@ -38,8 +38,7 @@ variable "kms_key_admin_roles" {
 
 }
 
-variable "git_token" {
-  description = "My git token"
-  type        = string
-}
-
+# variable "git_token" {
+#   description = "My git token"
+#   type        = string
+# }

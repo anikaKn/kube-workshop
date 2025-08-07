@@ -12,4 +12,3 @@ ROOTDIR=$SCRIPTDIR
 # ${ROOTDIR}/terraform/spokes/destroy.sh staging
 ${ROOTDIR}/terraform/hub/destroy.sh
 # ${ROOTDIR}/terraform/codecommit/destroy.sh
-

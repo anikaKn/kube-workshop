@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-
+export ACCOUNT_ID=$(aws sts get-caller-identity --output text --query Account)
+export AWS_DEFAULT_REGION="us-west-2"
+export WORKING_DIR=$PWD
+export WORKSHOP_DIR=$PWD
+export GITOPS_DIR="$WORKING_DIR/gitops-repos"
+#git clone https://github.com/aws-samples/argocd-on-amazon-eks-workshop $WORKSHOP_DIR
+cd $WORKSHOP_DIR
 set -euo pipefail
 echo "" > ~/.ssh/config # My code
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"

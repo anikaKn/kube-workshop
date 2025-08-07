@@ -34,10 +34,10 @@ output "access_argocd" {
 }
 
 
-output "argocd_iam_role_arn" {
-  description = "IAM Role for ArgoCD Cluster Hub, use to connect to spoke clusters"
-  value       = module.argocd_irsa.iam_role_arn
-}
+# output "argocd_iam_role_arn" {
+#   description = "IAM Role for ArgoCD Cluster Hub, use to connect to spoke clusters"
+#   value       = module.argocd_irsa.iam_role_arn
+# }
 
 output "cluster_name" {
   description = "Cluster Hub name"
