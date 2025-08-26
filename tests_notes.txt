@@ -1,0 +1,35 @@
+## External secrets
+
+kubectl apply -f test_ExternalSecret.yaml
+kubectl apply -f test_ClusterSecretStore.yaml
+
+
+kubectl get secret aknys-git-token -n argocd
+kubectl describe secret aknys-git-token -n argocd
+
+kubectl get secret aknys-git-token -n argocd -o jsonpath="{.data.gitToken}" | base64 -d
+
+
+
+kubectl get pods -n external-secrets
+kubectl get externalsecret aknys-git-token -n argocd -o yaml
+kubectl logs -n external-secrets -l app.kubernetes.io/name=external-secrets
+
+
+aws secretsmanager get-secret-value --secret-id aknys-git-token
+
+kubectl get crd | grep secretstore
+
+resource "helm_release" "external_secrets" {
+  name       = "external-secrets"
+  repository = "https://charts.external-secrets.io"
+  chart      = "external-secrets"
+  namespace  = "external-secrets"
+  create_namespace = true
+
+  set {
+    name  = "installCRDs"
+    value = "true"
+  }
+  # ...other values...
+}

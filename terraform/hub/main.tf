@@ -108,7 +108,7 @@ locals {
     enable_aws_privateca_issuer                  = false
     enable_cluster_autoscaler                    = false
     enable_external_dns                          = true
-    enable_external_secrets                      = false
+    enable_external_secrets                      = true
     enable_aws_load_balancer_controller          = true
     enable_fargate_fluentbit                     = false
     enable_aws_for_fluentbit                     = false
@@ -369,9 +369,9 @@ resource "kubernetes_namespace" "argocd" {
 resource "aws_eks_access_entry" "karpenter_node_access_entry" {
   cluster_name  = module.eks.cluster_name
   principal_arn = module.eks_blueprints_addons.karpenter.node_iam_role_arn
-  user_name = "karpenter-node"
-  kubernetes_groups   = [
-      "karpenter-nodes",
+  user_name     = "karpenter-node"
+  kubernetes_groups = [
+    "karpenter-nodes",
     # "system:bootstrappers",
     # "system:nodes"
   ]
@@ -513,7 +513,7 @@ module "gitops_bridge_bootstrap" {
     recreate_pods    = true
     force_update     = true
 
-   # values = [local.argocd_tolerations_yaml]
+    # values = [local.argocd_tolerations_yaml]
 
   }
 
@@ -556,13 +556,46 @@ resource "aws_iam_policy" "irsa_policy" {
   tags        = local.tags
 }
 
+# data "aws_iam_policy_document" "irsa_policy" {
+#   statement {
+#     effect    = "Allow"
+#     resources = ["*"]
+#     actions   = ["sts:AssumeRole"]
+#   }
+
+# }
+
 data "aws_iam_policy_document" "irsa_policy" {
   statement {
-    effect    = "Allow"
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
     resources = ["*"]
-    actions   = ["sts:AssumeRole"]
   }
 
+  # Allow read access to Secrets Manager
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecrets"
+    ]
+    resources = ["*"] # Or restrict to specific ARNs
+  }
+
+  # Allow read access to SSM Parameter Store
+  statement {
+    effect = "Allow"
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+      "ssm:GetParametersByPath",
+      "ssm:DescribeParameters"
+    ]
+    resources = ["*"] # Or restrict to specific ARNs
+  }
 }
 
 ################################################################################
@@ -599,7 +632,7 @@ module "eks_blueprints_addons" {
   external_dns_route53_zone_arns      = local.external_dns_route53_zone_arns
 
 
-tags = local.tags
+  tags = local.tags
   #   tags = merge(
   #   local.tags,
   #   {
@@ -640,40 +673,40 @@ module "eks" {
   # create_cluster_security_group = false #added from site
   #create_node_security_group    = false #added from site
 
-  authentication_mode = "API_AND_CONFIG_MAP"  ## TODO changed 22.07.24 
+  authentication_mode = "API_AND_CONFIG_MAP" ## TODO changed 22.07.24 
 
-#  create_node_iam_role = false
-# node_iam_role_arn    =  module.eks_blueprints_addons.karpenter.node_iam_role_arn
-#   # Since the node group role will already have an access entry
-#   create_access_entry = false
+  #  create_node_iam_role = false
+  # node_iam_role_arn    =  module.eks_blueprints_addons.karpenter.node_iam_role_arn
+  #   # Since the node group role will already have an access entry
+  #   create_access_entry = false
 
 
-#   manage_aws_auth = true
-# aws_auth_roles = [
-#   {
-#     rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
-#     username = "system:node:{{EC2PrivateDNSName}}"
-#     groups   = [
-#       "system:bootstrappers",
-#       "system:nodes"
-#     ]
-#   },
-#   {
-#     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aknys-critical-addons-arm20250731165617886800000003"
-#     username = "system:node:{{EC2PrivateDNSName}}"
-#     groups   = [
-#       "system:bootstrappers",
-#       "system:nodes"
-#     ]
-#   },
-#   {
-#     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
-#     username = "admin"
-#     groups   = [
-#       "system:masters"
-#     ]
-#   }
-# ]
+  #   manage_aws_auth = true
+  # aws_auth_roles = [
+  #   {
+  #     rolearn  = module.eks_blueprints_addons.karpenter.node_iam_role_arn
+  #     username = "system:node:{{EC2PrivateDNSName}}"
+  #     groups   = [
+  #       "system:bootstrappers",
+  #       "system:nodes"
+  #     ]
+  #   },
+  #   {
+  #     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aknys-critical-addons-arm20250731165617886800000003"
+  #     username = "system:node:{{EC2PrivateDNSName}}"
+  #     groups   = [
+  #       "system:bootstrappers",
+  #       "system:nodes"
+  #     ]
+  #   },
+  #   {
+  #     rolearn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/AWSReservedSSO_PowerUserAccessCustom_a7d8c8044914d012"
+  #     username = "admin"
+  #     groups   = [
+  #       "system:masters"
+  #     ]
+  #   }
+  # ]
 
 
 
